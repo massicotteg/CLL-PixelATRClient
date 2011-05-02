@@ -73,7 +73,7 @@
      <string>Joindre</string>
     </property>
    </widget>
-   <widget class="QListWidget" name="listWidget">
+   <widget class="QListWidget" name="lbParties">
     <property name="geometry">
      <rect>
       <x>380</x>

@@ -1,6 +1,9 @@
 #ifndef PIXELATRCLIENTWINDOW_H
 #define PIXELATRCLIENTWINDOW_H
 
+#define HAUTEUR 630
+#define LONGUEUR 940
+
 #include <QMainWindow>
 
 namespace Ui {
@@ -17,6 +20,7 @@ public:
 
 private:
     Ui::PixelATRClientWindow *ui;
+    void paintEvent(QPaintEvent *);
 };
 
 #endif // PIXELATRCLIENTWINDOW_H

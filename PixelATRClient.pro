@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui network
 
 TARGET = PixelATRClient
 TEMPLATE = app
@@ -12,10 +12,13 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         pixelatrclientwindow.cpp \
-    joindrequitterwindow.cpp
+    joindrequitterwindow.cpp \
+    salonjoueurs.cpp
 
 HEADERS  += pixelatrclientwindow.h \
-    joindrequitterwindow.h
+    joindrequitterwindow.h \
+    salonjoueurs.h
 
 FORMS    += pixelatrclientwindow.ui \
-    joindrequitterwindow.ui
+    joindrequitterwindow.ui \
+    salonjoueurs.ui

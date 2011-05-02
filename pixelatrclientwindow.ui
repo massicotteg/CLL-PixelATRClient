@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>941</width>
-    <height>723</height>
+    <height>700</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -28,6 +28,9 @@
       <width>941</width>
       <height>71</height>
      </rect>
+    </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
     </property>
     <property name="frameShape">
      <enum>QFrame::NoFrame</enum>
@@ -66,7 +69,6 @@
     </widget>
    </widget>
   </widget>
-  <widget class="QStatusBar" name="statusBar"/>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>
