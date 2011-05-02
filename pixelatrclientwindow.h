@@ -5,6 +5,7 @@
 #define LONGUEUR 940
 
 #include <QMainWindow>
+#include "joindrequitterwindow.h"
 
 namespace Ui {
     class PixelATRClientWindow;
@@ -17,6 +18,9 @@ class PixelATRClientWindow : public QMainWindow
 public:
     explicit PixelATRClientWindow(QWidget *parent = 0);
     ~PixelATRClientWindow();
+
+private slots:
+    void on_btnJoindreQuitter_clicked();
 
 private:
     Ui::PixelATRClientWindow *ui;

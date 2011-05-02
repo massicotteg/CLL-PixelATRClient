@@ -42,3 +42,9 @@ void PixelATRClientWindow::paintEvent(QPaintEvent *)
     painter.drawRects(rects);
     */
 }
+
+void PixelATRClientWindow::on_btnJoindreQuitter_clicked()
+{
+    JoindreQuitterWindow *joindreQuitterWindow = new JoindreQuitterWindow(this);
+    joindreQuitterWindow->show();
+}
