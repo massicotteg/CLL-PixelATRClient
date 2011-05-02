@@ -22,7 +22,6 @@ private slots:
 
 private:
     Ui::JoindreQuitterWindow *ui;
-    QTcpSocket socket;
     QString IPServeur;
     int PortServeur;
 };
