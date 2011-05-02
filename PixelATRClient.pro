@@ -11,8 +11,11 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        pixelatrclientwindow.cpp
+        pixelatrclientwindow.cpp \
+    joindrequitterwindow.cpp
 
-HEADERS  += pixelatrclientwindow.h
+HEADERS  += pixelatrclientwindow.h \
+    joindrequitterwindow.h
 
-FORMS    += pixelatrclientwindow.ui
+FORMS    += pixelatrclientwindow.ui \
+    joindrequitterwindow.ui
