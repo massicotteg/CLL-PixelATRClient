@@ -24,20 +24,29 @@ void JoindreQuitterWindow::on_btnAfficherParties_clicked()
         socket->disconnectFromHost();
 
     socket->connectToHost(IPServeur, PortServeur);
+    socket->waitForConnected(100);
 
-    QByteArray data;
-    data.append(Jeu::GamesRequest);
-    socket->write(data);
-    socket->waitForBytesWritten();
-    socket->waitForReadyRead(100);
-
-    QByteArray resultat = socket->readAll();
-    if (resultat[0] == Jeu::GamesReply)
+    if (socket->state() != QTcpSocket::ConnectedState)
     {
-        QString buffer = resultat.remove(0, 1);
-        QStringList Liste = buffer.split('\n');
+        QMessageBox::information(this, "Erreur", "Impossible de se connecter au serveur");
         ui->lbParties->clear();
-        ui->lbParties->addItems(Liste);
+    }
+    else
+    {
+        QByteArray data;
+        data.append(Jeu::GamesRequest);
+        socket->write(data);
+        socket->waitForBytesWritten();
+        socket->waitForReadyRead(100);
+
+        QByteArray resultat = socket->readAll();
+        if (resultat[0] == Jeu::GamesReply)
+        {
+            QString buffer = resultat.remove(0, 1);
+            QStringList Liste = buffer.split('\n');
+            ui->lbParties->clear();
+            ui->lbParties->addItems(Liste);
+        }
     }
 }
 

@@ -5,7 +5,7 @@ class Jeu
 {
 public:
     Jeu();
-    enum CodesClients { GamesRequest, GameCreate, GameJoin, GameSetReady, GameCData };
+    enum CodesClients { GamesRequest, GameCreate, GameJoin, GameSetReady, GameCData, GameQuit };
     enum CodesServeurs { GamesReply, GamePlayers, GameBegin, GameSData, GameEnd };
 };
 

@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Joindre une partie</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QLabel" name="lblAdresseServeur">

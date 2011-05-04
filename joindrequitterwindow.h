@@ -2,6 +2,7 @@
 #define JOINDREQUITTERWINDOW_H
 
 #include <QMainWindow>
+#include "QtGui"
 #include "QtNetwork"
 #include "jeu.h"
 #include "threadcomm.h"

@@ -17,6 +17,11 @@ public:
     explicit SalonJoueurs(QTcpSocket *socket, QWidget *parent = 0);
     ~SalonJoueurs();
 
+private slots:
+    void on_btnPret_clicked();
+
+    void on_btnQuitter_clicked();
+
 private:
     Ui::SalonJoueurs *ui;
     QTcpSocket *Socket;

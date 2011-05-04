@@ -17,7 +17,6 @@ PixelATRClientWindow::~PixelATRClientWindow()
 void PixelATRClientWindow::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
-    QVector<QRect> rects = QVector<QRect>();
     painter.setBrush(QBrush(Qt::darkGray));
     QRect rect(0, 0, LONGUEUR, HAUTEUR);
     painter.drawRect(rect);
@@ -25,6 +24,7 @@ void PixelATRClientWindow::paintEvent(QPaintEvent *)
     painter.drawRect(rect);
 
     /*
+    QVector<QRect> rects = QVector<QRect>();
     rects.append(QRect(10, 10, 2, 2));
     rects.append(QRect(50, 50, 2, 2));
 
