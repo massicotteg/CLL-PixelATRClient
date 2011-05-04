@@ -29,6 +29,8 @@ private slots:
 
     void on_btnJoindre_clicked();
 
+    void on_btnNouvellePartie_clicked();
+
 private:
     Ui::JoindreQuitterWindow *ui;
     QString IPServeur;

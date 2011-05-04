@@ -44,6 +44,7 @@ void JoindreQuitterWindow::on_btnAfficherParties_clicked()
         {
             QString buffer = resultat.remove(0, 1);
             QStringList Liste = buffer.split('\n');
+            Liste.removeLast();
             ui->lbParties->clear();
             ui->lbParties->addItems(Liste);
         }
@@ -58,13 +59,36 @@ void JoindreQuitterWindow::on_lbParties_currentTextChanged(QString currentText)
 
 void JoindreQuitterWindow::on_btnJoindre_clicked()
 {
-    QByteArray data;
-    data.append(Jeu::GameJoin);
-    data.append("Bob");
-    data.append('\n');
-    data.append(Partie);
+    QByteArray envoi;
+    envoi.append(Jeu::GameJoin);
+    envoi.append("Bob");
+    envoi.append('\n');
+    envoi.append(Partie);
 
-    socket->write(data);
+    socket->write(envoi);
+
+    SalonJoueurs *salonjoueurs = new SalonJoueurs(socket, this);
+    salonjoueurs->show();
+}
+
+void JoindreQuitterWindow::on_btnNouvellePartie_clicked()
+{
+    Partie = QInputDialog::getText(this, "Nouvelle partie", "Nom");
+
+    QByteArray envoi;
+    envoi.append(Jeu::GameCreate);
+    envoi.append(Partie);
+    envoi.append((char)0);
+    socket->write(envoi);
+
+    ui->lbParties->addItem(Partie);
+
+    envoi.clear();
+    envoi.append(Jeu::GameJoin);
+    envoi.append("Bob");
+    envoi.append("\n");
+    envoi.append(Partie);
+    socket->write(envoi);
 
     SalonJoueurs *salonjoueurs = new SalonJoueurs(socket, this);
     salonjoueurs->show();

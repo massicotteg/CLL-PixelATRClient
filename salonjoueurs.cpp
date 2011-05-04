@@ -20,6 +20,7 @@ SalonJoueurs::SalonJoueurs(QTcpSocket *socket, QWidget *parent) :
     {
         QString buffer = resultat.remove(0, 1);
         QStringList Liste = buffer.split('\n');
+        Liste.removeLast();
         ui->lbJoueurs->clear();
         ui->lbJoueurs->addItems(Liste);
     }
