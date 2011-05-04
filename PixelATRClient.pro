@@ -14,12 +14,14 @@ SOURCES += main.cpp\
         pixelatrclientwindow.cpp \
     joindrequitterwindow.cpp \
     salonjoueurs.cpp \
-    jeu.cpp
+    jeu.cpp \
+    threadcomm.cpp
 
 HEADERS  += pixelatrclientwindow.h \
     joindrequitterwindow.h \
     salonjoueurs.h \
-    jeu.h
+    jeu.h \
+    threadcomm.h
 
 FORMS    += pixelatrclientwindow.ui \
     joindrequitterwindow.ui \

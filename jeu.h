@@ -5,8 +5,8 @@ class Jeu
 {
 public:
     Jeu();
-    enum CodesClients { RequeteParties, GameCreate, GameJoin, ClientDebutPartie, ClientGameData };
-    enum CodesServeurs { DirPatie, RefreshPartiePoints, ServeurDebutPartie, ServeurGameData, FinPartie };
+    enum CodesClients { GamesRequest, GameCreate, GameJoin, GameSetReady, GameCData };
+    enum CodesServeurs { GamesReply, GamePlayers, GameBegin, GameSData, GameEnd };
 };
 
 #endif // JEU_H

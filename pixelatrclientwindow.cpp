@@ -7,7 +7,6 @@ PixelATRClientWindow::PixelATRClientWindow(QWidget *parent) :
     ui(new Ui::PixelATRClientWindow)
 {
     ui->setupUi(this);
-    int i = 0;
 }
 
 PixelATRClientWindow::~PixelATRClientWindow()
