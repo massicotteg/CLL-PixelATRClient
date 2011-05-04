@@ -20,6 +20,9 @@ void JoindreQuitterWindow::on_btnAfficherParties_clicked()
     IPServeur = ui->txtAdresseServeur->text();
     PortServeur = ui->txtPort->text().toInt();
 
+    if (socket->state() == QTcpSocket::ConnectedState)
+        socket->disconnectFromHost();
+
     socket->connectToHost(IPServeur, PortServeur);
 
     QByteArray data;
@@ -33,6 +36,7 @@ void JoindreQuitterWindow::on_btnAfficherParties_clicked()
     {
         QString buffer = resultat.remove(0, 1);
         QStringList Liste = buffer.split('\n');
+        ui->lbParties->clear();
         ui->lbParties->addItems(Liste);
     }
 }
