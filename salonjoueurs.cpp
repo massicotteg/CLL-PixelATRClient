@@ -47,4 +47,8 @@ void SalonJoueurs::slReadyRead()
         ui->lbJoueurs->clear();
         ui->lbJoueurs->addItems(Liste);
     }
+
+    if (resultat[0] == Jeu::GameBegin)
+    {
+    }
 }

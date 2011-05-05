@@ -46,8 +46,6 @@ private:
     void GamesRequest();
 
     SalonJoueurs *salonJoueurs;
-
-    bool DeconnexionVoulue;
 };
 
 #endif // JOINDREQUITTERWINDOW_H

@@ -12,8 +12,6 @@ JoindreQuitterWindow::JoindreQuitterWindow(Jeu *jeu, QWidget *parent) :
     m_Jeu->socket = new QTcpSocket();
 
    // connect(m_Jeu->socket, SIGNAL(disconnected()), this, SLOT(slDisconnected()));
-
-    DeconnexionVoulue = false;
 }
 
 JoindreQuitterWindow::~JoindreQuitterWindow()
@@ -71,14 +69,10 @@ bool JoindreQuitterWindow::Connexion()
     PortServeur = ui->txtPort->text().toInt();
 
     if (m_Jeu->socket->state() == QTcpSocket::ConnectedState)
-    {
-        DeconnexionVoulue = true;
         m_Jeu->socket->disconnectFromHost();
-    }
 
     m_Jeu->socket->connectToHost(IPServeur, PortServeur);
     m_Jeu->socket->waitForConnected(100);
-    DeconnexionVoulue = false;
 
     return (m_Jeu->socket->state() == QTcpSocket::ConnectedState);
 }
@@ -126,10 +120,7 @@ void JoindreQuitterWindow::GamesRequest()
 
 void JoindreQuitterWindow::slDisconnected()
 {
-    if (DeconnexionVoulue)
-    {
-        QMessageBox::critical(this, "Erreur CRITIQUE !!!", "Vous avez été déconnecté du serveur !!!");
-        salonJoueurs->close();
-        this->close();
-    }
+    QMessageBox::critical(this, "Erreur CRITIQUE !!!", "Vous avez été déconnecté du serveur !!!");
+    salonJoueurs->close();
+    this->close();
 }
