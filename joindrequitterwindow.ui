@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>800</width>
-    <height>240</height>
+    <height>276</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -36,6 +36,9 @@
       <height>21</height>
      </rect>
     </property>
+    <property name="text">
+     <string>10.1.1.142</string>
+    </property>
    </widget>
    <widget class="QLineEdit" name="txtPort">
     <property name="geometry">
@@ -45,6 +48,9 @@
       <width>131</width>
       <height>21</height>
      </rect>
+    </property>
+    <property name="text">
+     <string>60123</string>
     </property>
    </widget>
    <widget class="QLabel" name="lblPort">
@@ -123,6 +129,29 @@
     </property>
     <property name="text">
      <string>Afficher les parties hébergées par le serveur</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="lblNomJoueur">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>220</y>
+      <width>111</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Nom de joueur :</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="txtNomJoueur">
+    <property name="geometry">
+     <rect>
+      <x>150</x>
+      <y>220</y>
+      <width>131</width>
+      <height>21</height>
+     </rect>
     </property>
    </widget>
   </widget>

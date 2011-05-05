@@ -25,6 +25,7 @@ private slots:
 private:
     Ui::PixelATRClientWindow *ui;
     void paintEvent(QPaintEvent *);
+    Jeu *m_Jeu;
 };
 
 #endif // PIXELATRCLIENTWINDOW_H

@@ -7,6 +7,8 @@ PixelATRClientWindow::PixelATRClientWindow(QWidget *parent) :
     ui(new Ui::PixelATRClientWindow)
 {
     ui->setupUi(this);
+
+    m_Jeu = new Jeu();
 }
 
 PixelATRClientWindow::~PixelATRClientWindow()
@@ -44,6 +46,6 @@ void PixelATRClientWindow::paintEvent(QPaintEvent *)
 
 void PixelATRClientWindow::on_btnJoindreQuitter_clicked()
 {
-    JoindreQuitterWindow *joindreQuitterWindow = new JoindreQuitterWindow(this);
+    JoindreQuitterWindow *joindreQuitterWindow = new JoindreQuitterWindow(m_Jeu, this);
     joindreQuitterWindow->show();
 }

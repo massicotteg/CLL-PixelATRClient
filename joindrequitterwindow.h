@@ -17,7 +17,7 @@ class JoindreQuitterWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit JoindreQuitterWindow(QWidget *parent = 0);
+    explicit JoindreQuitterWindow(Jeu *jeu, QWidget *parent = 0);
     ~JoindreQuitterWindow();
 
 signals:
@@ -31,12 +31,23 @@ private slots:
 
     void on_btnNouvellePartie_clicked();
 
+    void slDisconnected();
+
 private:
     Ui::JoindreQuitterWindow *ui;
     QString IPServeur;
     int PortServeur;
-    QTcpSocket *socket;
     QString Partie;
+    Jeu *m_Jeu;
+
+    bool Connexion();
+    void GameJoin();
+    void GameCreate();
+    void GamesRequest();
+
+    SalonJoueurs *salonJoueurs;
+
+    bool DeconnexionVoulue;
 };
 
 #endif // JOINDREQUITTERWINDOW_H

@@ -14,7 +14,7 @@ class SalonJoueurs : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit SalonJoueurs(QTcpSocket *socket, QWidget *parent = 0);
+    explicit SalonJoueurs(Jeu *jeu, QWidget *parent = 0);
     ~SalonJoueurs();
 
 private slots:
@@ -22,9 +22,11 @@ private slots:
 
     void on_btnQuitter_clicked();
 
+    void slReadyRead();
+
 private:
     Ui::SalonJoueurs *ui;
-    QTcpSocket *Socket;
+    Jeu *m_Jeu;
 };
 
 #endif // SALONJOUEURS_H
