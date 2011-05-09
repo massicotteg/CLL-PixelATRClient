@@ -8,8 +8,6 @@ SalonJoueurs::SalonJoueurs(Jeu *jeu, QWidget *parent) :
     ui->setupUi(this);
 
     m_Jeu = jeu;
-
-    connect(m_Jeu->socket, SIGNAL(readyRead()), this, SLOT(slReadyRead()));
 }
 
 SalonJoueurs::~SalonJoueurs()
@@ -34,21 +32,15 @@ void SalonJoueurs::on_btnQuitter_clicked()
     QByteArray envoi;
     envoi.append(Jeu::GameQuit);
     m_Jeu->socket->write(envoi);
+    m_Jeu->socket->disconnectFromHost();
+    m_Jeu->socket->close();
 }
 
-void SalonJoueurs::slReadyRead()
+void SalonJoueurs::GamePlayers(QByteArray resultat)
 {
-    QByteArray resultat = m_Jeu->socket->readAll();
-    if (resultat[0] == Jeu::GamePlayers)
-    {
-        QString buffer = resultat.remove(0, 1);
-        QStringList Liste = buffer.split('\n');
-        Liste.removeLast();
-        ui->lbJoueurs->clear();
-        ui->lbJoueurs->addItems(Liste);
-    }
-
-    if (resultat[0] == Jeu::GameBegin)
-    {
-    }
+    QString buffer = resultat.remove(0, 1);
+    QStringList Liste = buffer.split('\n');
+    Liste.removeLast();
+    ui->lbJoueurs->clear();
+    ui->lbJoueurs->addItems(Liste);
 }

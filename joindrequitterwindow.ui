@@ -37,7 +37,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>10.1.1.142</string>
+     <string>10.1.1.123</string>
     </property>
    </widget>
    <widget class="QLineEdit" name="txtPort">

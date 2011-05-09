@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include "QtNetwork"
 #include "jeu.h"
+#include "QtGui"
 
 namespace Ui {
     class SalonJoueurs;
@@ -15,6 +16,8 @@ class SalonJoueurs : public QMainWindow
 
 public:
     explicit SalonJoueurs(Jeu *jeu, QWidget *parent = 0);
+
+    void GamePlayers(QByteArray resultat);
     ~SalonJoueurs();
 
 private slots:
@@ -27,6 +30,7 @@ private slots:
 private:
     Ui::SalonJoueurs *ui;
     Jeu *m_Jeu;
+
 };
 
 #endif // SALONJOUEURS_H

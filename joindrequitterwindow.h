@@ -18,6 +18,8 @@ class JoindreQuitterWindow : public QMainWindow
 
 public:
     explicit JoindreQuitterWindow(Jeu *jeu, QWidget *parent = 0);
+
+    void GamesReply(QByteArray resultat);
     ~JoindreQuitterWindow();
 
 signals:
@@ -32,6 +34,8 @@ private slots:
     void on_btnNouvellePartie_clicked();
 
     void slDisconnected();
+
+    void slReadyRead();
 
 private:
     Ui::JoindreQuitterWindow *ui;

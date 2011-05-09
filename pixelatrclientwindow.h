@@ -6,6 +6,7 @@
 
 #include <QMainWindow>
 #include "joindrequitterwindow.h"
+#include "salonjoueurs.h"
 
 namespace Ui {
     class PixelATRClientWindow;
@@ -22,10 +23,13 @@ public:
 private slots:
     void on_btnJoindreQuitter_clicked();
 
+    void slReadyRead();
+
 private:
     Ui::PixelATRClientWindow *ui;
     void paintEvent(QPaintEvent *);
     Jeu *m_Jeu;
+ //   JoindreQuitterWindow* joindreQuitterWindow;
 };
 
 #endif // PIXELATRCLIENTWINDOW_H

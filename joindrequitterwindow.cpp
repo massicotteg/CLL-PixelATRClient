@@ -1,6 +1,10 @@
 #include "joindrequitterwindow.h"
 #include "ui_joindrequitterwindow.h"
 
+#define MAP_DEFAULT 100
+#define MAP_MIN 50
+#define MAP_MAX 200
+
 JoindreQuitterWindow::JoindreQuitterWindow(Jeu *jeu, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::JoindreQuitterWindow)
@@ -38,10 +42,15 @@ void JoindreQuitterWindow::on_lbParties_currentTextChanged(QString currentText)
 
 void JoindreQuitterWindow::on_btnJoindre_clicked()
 {
-    GameJoin();
+    if (ui->txtNomJoueur->text() != "")
+    {
+        GameJoin();
 
-    salonJoueurs = new SalonJoueurs(m_Jeu, this);
-    salonJoueurs->show();
+        m_Jeu->salonJoueurs = new SalonJoueurs(m_Jeu, this);
+        m_Jeu->salonJoueurs->show();
+    }
+    else
+        QMessageBox::critical(this, "Pas de nom de joueur", "Veuillez specifier un nom de joueur !");
 }
 
 void JoindreQuitterWindow::on_btnNouvellePartie_clicked()
@@ -69,7 +78,10 @@ bool JoindreQuitterWindow::Connexion()
     PortServeur = ui->txtPort->text().toInt();
 
     if (m_Jeu->socket->state() == QTcpSocket::ConnectedState)
+    {
         m_Jeu->socket->disconnectFromHost();
+        m_Jeu->socket->close();
+    }
 
     m_Jeu->socket->connectToHost(IPServeur, PortServeur);
     m_Jeu->socket->waitForConnected(100);
@@ -83,13 +95,14 @@ void JoindreQuitterWindow::GameCreate()
     envoi.append(Jeu::GameCreate);
     envoi.append(Partie);
     envoi.append('\n');
-    envoi.append((char)0);
+    envoi.append((char)QInputDialog::getInt(this, "Nouvelle partie", "Taille de la map", MAP_DEFAULT, MAP_MIN, MAP_MAX));
     m_Jeu->socket->write(envoi);
 }
 
 void JoindreQuitterWindow::GameJoin()
 {
     m_Jeu->NomJoueur = ui->txtNomJoueur->text();
+
     QByteArray envoi;
     envoi.append(Jeu::GameJoin);
     envoi.append(m_Jeu->NomJoueur);
@@ -97,6 +110,7 @@ void JoindreQuitterWindow::GameJoin()
     envoi.append(Partie);
 
     m_Jeu->socket->write(envoi);
+    m_Jeu->socket->waitForBytesWritten();
 }
 
 void JoindreQuitterWindow::GamesRequest()
@@ -105,17 +119,6 @@ void JoindreQuitterWindow::GamesRequest()
     envoi.append(Jeu::GamesRequest);
     m_Jeu->socket->write(envoi);
     m_Jeu->socket->waitForBytesWritten();
-    m_Jeu->socket->waitForReadyRead(100);
-
-    QByteArray resultat = m_Jeu->socket->readAll();
-    if (resultat[0] == Jeu::GamesReply)
-    {
-        QString buffer = resultat.remove(0, 1);
-        QStringList Liste = buffer.split('\n');
-        Liste.removeLast();
-        ui->lbParties->clear();
-        ui->lbParties->addItems(Liste);
-    }
 }
 
 void JoindreQuitterWindow::slDisconnected()
@@ -123,4 +126,19 @@ void JoindreQuitterWindow::slDisconnected()
     QMessageBox::critical(this, "Erreur CRITIQUE !!!", "Vous avez été déconnecté du serveur !!!");
     salonJoueurs->close();
     this->close();
+}
+
+void JoindreQuitterWindow::GamesReply(QByteArray resultat)
+{
+    QString buffer = resultat.remove(0, 1);
+    QStringList Liste = buffer.split('\n');
+    Liste.removeLast();
+    ui->lbParties->clear();
+    if (Liste.count() == 0)
+    {
+        QMessageBox::information(this, "Pas de parties", "Il n'y a aucune partie cree sur le serveur");
+        ui->btnJoindre->setEnabled(false);
+    }
+    else
+        ui->lbParties->addItems(Liste);
 }

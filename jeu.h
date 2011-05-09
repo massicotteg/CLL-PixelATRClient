@@ -2,6 +2,8 @@
 #define JEU_H
 
 #include "QtNetwork"
+#include "salonjoueurs.h"
+#include "joindrequitterwindow.h"
 
 class Jeu
 {
