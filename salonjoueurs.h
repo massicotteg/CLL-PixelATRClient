@@ -2,8 +2,6 @@
 #define SALONJOUEURS_H
 
 #include <QMainWindow>
-#include "QtNetwork"
-#include "jeu.h"
 #include "QtGui"
 
 namespace Ui {
@@ -15,22 +13,20 @@ class SalonJoueurs : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit SalonJoueurs(Jeu *jeu, QWidget *parent = 0);
-
-    void GamePlayers(QByteArray resultat);
+    explicit SalonJoueurs(QWidget *parent = 0);
     ~SalonJoueurs();
+
+signals:
+    void SetReady();
+    void Quit();
 
 private slots:
     void on_btnPret_clicked();
-
     void on_btnQuitter_clicked();
-
-    void slReadyRead();
+    void GamePlayers(QByteArray resultat);
 
 private:
     Ui::SalonJoueurs *ui;
-    Jeu *m_Jeu;
-
 };
 
 #endif // SALONJOUEURS_H

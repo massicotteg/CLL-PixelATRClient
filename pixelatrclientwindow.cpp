@@ -7,10 +7,7 @@ PixelATRClientWindow::PixelATRClientWindow(QWidget *parent) :
     ui(new Ui::PixelATRClientWindow)
 {
     ui->setupUi(this);
-
-    m_Jeu = new Jeu();
-
-    connect(m_Jeu->socket, SIGNAL(readyRead()), this, SLOT(slReadyRead()));
+    m_Jeu = new thJeu();
 }
 
 PixelATRClientWindow::~PixelATRClientWindow()
@@ -48,24 +45,5 @@ void PixelATRClientWindow::paintEvent(QPaintEvent *)
 
 void PixelATRClientWindow::on_btnJoindreQuitter_clicked()
 {
-    joindreQuitterWindow = new JoindreQuitterWindow(m_Jeu, this);
-    joindreQuitterWindow->show();
-}
-
-void PixelATRClientWindow::slReadyRead()
-{
-    QByteArray resultat = m_Jeu->socket->readAll();
-
-    switch (resultat[0])
-    {
-        case Jeu::GamesReply:
-            joindreQuitterWindow->GamesReply(resultat);
-            break;
-        case Jeu::GamePlayers:
-            joindreQuitterWindow->salonJoueurs->GamePlayers(resultat);
-            break;
-        case Jeu::GameBegin:
-            QMessageBox::about(this, "Début", "Début de la partie !!!");
-            break;
-    }
+    m_Jeu->joindreQuitterWindow->show();
 }

@@ -1,13 +1,11 @@
 #include "salonjoueurs.h"
 #include "ui_salonjoueurs.h"
 
-SalonJoueurs::SalonJoueurs(Jeu *jeu, QWidget *parent) :
+SalonJoueurs::SalonJoueurs(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::SalonJoueurs)
 {
     ui->setupUi(this);
-
-    m_Jeu = jeu;
 }
 
 SalonJoueurs::~SalonJoueurs()
@@ -17,9 +15,7 @@ SalonJoueurs::~SalonJoueurs()
 
 void SalonJoueurs::on_btnPret_clicked()
 {
-    QByteArray envoi;
-    envoi.append(Jeu::GameSetReady);
-    m_Jeu->socket->write(envoi);
+    emit SetReady();
 
     if (ui->btnPret->text() == "Pret")
         ui->btnPret->setText("Non Pret");
@@ -29,11 +25,7 @@ void SalonJoueurs::on_btnPret_clicked()
 
 void SalonJoueurs::on_btnQuitter_clicked()
 {
-    QByteArray envoi;
-    envoi.append(Jeu::GameQuit);
-    m_Jeu->socket->write(envoi);
-    m_Jeu->socket->disconnectFromHost();
-    m_Jeu->socket->close();
+    emit Quit();
 }
 
 void SalonJoueurs::GamePlayers(QByteArray resultat)
