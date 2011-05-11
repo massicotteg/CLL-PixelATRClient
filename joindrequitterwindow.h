@@ -14,6 +14,7 @@ class JoindreQuitterWindow : public QMainWindow
 
 public:
     explicit JoindreQuitterWindow(QWidget *parent = 0);
+    bool Voulue;
     ~JoindreQuitterWindow();
 
 signals:
