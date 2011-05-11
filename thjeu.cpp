@@ -30,11 +30,13 @@ bool thJeu::Connexion(QString IPServeur, int PortServeur)
 {
     if (IPServeur != socket->peerName() || PortServeur != socket->peerPort())
     {
+        joindreQuitterWindow->Voulue = true;
         if (socket->state() == QTcpSocket::ConnectedState)
         {
             socket->disconnectFromHost();
             socket->reset();
         }
+        joindreQuitterWindow->Voulue = false;
 
         socket->connectToHost(IPServeur, PortServeur);
         socket->waitForConnected(100);
@@ -67,12 +69,14 @@ void thJeu::socket_ReadyRead()
             break;
         case GameEnd:
             emit rGameEnd();
-            salonJoueurs->close();
+            joindreQuitterWindow->Voulue = true;
+            socket->disconnectFromHost();
             break;
     }
 }
 void thJeu::socket_Disconnected()
 {
+    NomJoueur = "";
     salonJoueurs->close();
 }
 
@@ -106,13 +110,16 @@ void thJeu::eGameCreate(QString IPServeur, int PortServeur, QString Partie, char
 
 void thJeu::eGameJoin(QString nomJoueur, QString Partie)
 {
-    NomJoueur = nomJoueur;
+    if(NomJoueur == "")
+    {
+        NomJoueur = nomJoueur;
 
-    QByteArray envoi = QByteArray(1, GameJoin);
-    envoi.append(NomJoueur + '\n' + Partie);
+        QByteArray envoi = QByteArray(1, GameJoin);
+        envoi.append(NomJoueur + '\n' + Partie);
 
-    socket->write(envoi);
-    socket->waitForBytesWritten();
+        socket->write(envoi);
+        socket->waitForBytesWritten();
+    }
 
     delete salonJoueurs;
     salonJoueurs = new SalonJoueurs();
@@ -129,5 +136,10 @@ void thJeu::eGameQuit()
 {
     socket->write(QByteArray(1, GameQuit));
     socket->waitForBytesWritten();
+<<<<<<< HEAD
     socket->close();
+=======
+    joindreQuitterWindow->Voulue = true;
+    socket->disconnectFromHost();
+>>>>>>> e9a977434ee6f7bd3780bd0622aa2cadbefb9e64
 }

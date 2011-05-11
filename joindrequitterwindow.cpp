@@ -10,6 +10,7 @@ JoindreQuitterWindow::JoindreQuitterWindow(QWidget *parent) :
     ui(new Ui::JoindreQuitterWindow)
 {
     ui->setupUi(this);
+    Voulue = false;
 }
 
 JoindreQuitterWindow::~JoindreQuitterWindow()
@@ -46,14 +47,22 @@ void JoindreQuitterWindow::on_btnNouvellePartie_clicked()
 void JoindreQuitterWindow::on_btnJoindre_clicked()
 {
     if (ui->txtNomJoueur->text() != "")
+    {
         emit eGameJoin(ui->txtNomJoueur->text(), ui->lbParties->currentItem()->text());
+        ui->txtNomJoueur->setEnabled(false);
+    }
     else
         QMessageBox::critical(this, "Pas de nom de joueur", "Veuillez specifier un nom de joueur !");
 }
 
 void JoindreQuitterWindow::slDisconnected()
 {
-    QMessageBox::critical(this, "Erreur CRITIQUE !!!", "Vous avez été déconnecté du serveur !!!");
+    if (!Voulue)
+        QMessageBox::critical(this, "Erreur CRITIQUE !!!", "Vous avez été déconnecté du serveur !!!");
+    Voulue = false;
+    ui->lbParties->clear();
+    ui->btnJoindre->setEnabled(false);
+    ui->txtNomJoueur->setEnabled(true);
 }
 void JoindreQuitterWindow::on_lbParties_currentRowChanged(int currentRow)
 {
