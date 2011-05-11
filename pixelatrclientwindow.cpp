@@ -8,6 +8,12 @@ PixelATRClientWindow::PixelATRClientWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     m_Jeu = new thJeu();
+
+    timer = new QTimer(this);
+    PremierPoint = true;
+
+    connect(this, SIGNAL(siMouseClickGameData(QPoint)), m_Jeu, SLOT(slMouseClickGameData(QPoint)));
+    connect(timer, SIGNAL(timeout()), this, SLOT(slTimeOut()));
 }
 
 PixelATRClientWindow::~PixelATRClientWindow()
@@ -46,4 +52,19 @@ void PixelATRClientWindow::paintEvent(QPaintEvent *)
 void PixelATRClientWindow::on_btnJoindreQuitter_clicked()
 {
     m_Jeu->joindreQuitterWindow->show();
+}
+
+void PixelATRClientWindow::mousePressEvent(QMouseEvent *event)
+{
+    QMessageBox::about(this, "", QString::number(event->pos().x()) + " , " + QString::number(event->pos().y()));
+
+    if (PremierPoint)
+        timer->start(100);
+
+    PremierPoint = !PremierPoint;
+}
+
+void PixelATRClientWindow::slTimeOut()
+{
+    QMessageBox::about(this, "", QString::number(this->cursor().pos().x()) + " , " + QString::number(this->cursor().pos().y()));
 }

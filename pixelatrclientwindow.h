@@ -19,13 +19,22 @@ public:
     explicit PixelATRClientWindow(QWidget *parent = 0);
     ~PixelATRClientWindow();
 
+signals:
+    void siMouseClickGameData(QPoint);
+
+protected:
+    void mousePressEvent(QMouseEvent *);
+
 private slots:
-    void on_btnJoindreQuitter_clicked();
+    void on_btnJoindreQuitter_clicked(); 
+    void slTimeOut();
 
 private:
     Ui::PixelATRClientWindow *ui;
     void paintEvent(QPaintEvent *);
     thJeu *m_Jeu;
+    QTimer *timer;
+    bool PremierPoint;
 };
 
 #endif // PIXELATRCLIENTWINDOW_H

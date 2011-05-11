@@ -28,7 +28,7 @@ thJeu::thJeu(QObject *parent) :
 
 bool thJeu::Connexion(QString IPServeur, int PortServeur)
 {
-    if (IPServeur != socket->peerAddress().toString() || PortServeur != socket->peerPort())
+    if (IPServeur != socket->peerName() || PortServeur != socket->peerPort())
     {
         if (socket->state() == QTcpSocket::ConnectedState)
         {
@@ -114,6 +114,8 @@ void thJeu::eGameJoin(QString nomJoueur, QString Partie)
     socket->write(envoi);
     socket->waitForBytesWritten();
 
+    delete salonJoueurs;
+    salonJoueurs = new SalonJoueurs();
     salonJoueurs->show();
 }
 
@@ -127,6 +129,5 @@ void thJeu::eGameQuit()
 {
     socket->write(QByteArray(1, GameQuit));
     socket->waitForBytesWritten();
-    socket->disconnectFromHost();
     socket->close();
 }
