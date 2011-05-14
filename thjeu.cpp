@@ -23,6 +23,8 @@ thJeu::thJeu(QObject *parent) :
     connect(salonJoueurs, SIGNAL(Quit()), this, SLOT(eGameQuit()));
 
     connect(this, SIGNAL(rGamePlayers(QByteArray)), salonJoueurs, SLOT(GamePlayers(QByteArray)));
+
+    joueurs = QList<Joueur>();
 }
 
 
@@ -39,10 +41,7 @@ bool thJeu::Connexion(QString IPServeur, int PortServeur)
         joindreQuitterWindow->Voulue = false;
 
         socket->connectToHost(IPServeur, PortServeur);
-        socket->waitForConnected(100);
-
-
-        return (socket->state() == QTcpSocket::ConnectedState);
+        return socket->waitForConnected(100);
     }
     else
         return true;
@@ -55,6 +54,40 @@ void thJeu::socket_ReadyRead()
     {
         case GameSData:
             emit rGameSData();
+            if (resultat[1] == '0')
+            {
+                QString buf = resultat.remove(0, 2);
+                QStringList tempTrame = buf.split('\n');
+                tempTrame.removeLast();
+
+                // Liste d'obstacles
+
+                QStringList tempJoueurs;
+                for (int i = 2; i< tempTrame.length(); i++)
+                {
+                    tempJoueurs = tempTrame[i].split('\t');
+                    tempJoueurs.removeLast();
+
+                    Joueur temp;
+                    temp.Nom = tempJoueurs[0];
+                    temp.Couleur = (Qt::GlobalColor) tempJoueurs[1].toInt();
+
+                    QStringList tempArmee;
+                    for (int j = 2; j < tempJoueurs.length(); j++)
+                    {
+                        Armee armee;
+                        tempArmee = tempJoueurs[j].split('\r');
+                        armee.PosActuelle.setX(tempArmee[0].toInt());
+                        armee.PosActuelle.setY(tempArmee[1].toInt());
+                        armee.Pixels = tempArmee[2].toInt();
+                        temp.Armees.append(armee);
+                    }
+
+                    joueurs.append(temp);
+                    if (temp.Nom == NomJoueur)
+                        joueurs.move(i - 2, 0);
+                }
+            }
             break;
         case GamePlayers:
             emit rGamePlayers(resultat);
@@ -121,8 +154,6 @@ void thJeu::eGameJoin(QString nomJoueur, QString Partie)
         socket->waitForBytesWritten();
     }
 
-    delete salonJoueurs;
-    salonJoueurs = new SalonJoueurs();
     salonJoueurs->show();
 }
 
@@ -136,10 +167,33 @@ void thJeu::eGameQuit()
 {
     socket->write(QByteArray(1, GameQuit));
     socket->waitForBytesWritten();
-<<<<<<< HEAD
-    socket->close();
-=======
     joindreQuitterWindow->Voulue = true;
     socket->disconnectFromHost();
->>>>>>> e9a977434ee6f7bd3780bd0622aa2cadbefb9e64
+}
+
+void thJeu::slMouseClick(QList<QPoint> points)
+{
+    QByteArray envoi = QByteArray(1, GameCData);
+    envoi.append('\n');
+  //  envoi.append(QString::number(NoArmee(points[0])));
+    envoi.append('\n');
+    for (int i = 1; i < points.count(); i++)
+    {
+        envoi.append(QString::number(points[i].x()));
+        envoi.append('\r');
+        envoi.append(QString::number(points[i].y()));
+        envoi.append('\t');
+    }
+    envoi.append('\n');
+    envoi.append(Tick);
+    socket->write(envoi);
+}
+
+int thJeu::NoArmee(QPoint point)
+{
+    int i = 0;
+
+    // code
+
+    return i == joueurs[0].Armees.count() ? -1 : i;
 }

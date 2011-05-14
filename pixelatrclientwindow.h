@@ -20,10 +20,11 @@ public:
     ~PixelATRClientWindow();
 
 signals:
-    void siMouseClickGameData(QPoint);
+    void siMouseClick(QList<QPoint>);
 
 protected:
     void mousePressEvent(QMouseEvent *);
+    void mouseReleaseEvent(QMouseEvent *);
 
 private slots:
     void on_btnJoindreQuitter_clicked(); 
@@ -34,7 +35,7 @@ private:
     void paintEvent(QPaintEvent *);
     thJeu *m_Jeu;
     QTimer *timer;
-    bool PremierPoint;
+    QList<QPoint> points;
 };
 
 #endif // PIXELATRCLIENTWINDOW_H

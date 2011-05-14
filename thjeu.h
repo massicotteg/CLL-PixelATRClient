@@ -5,6 +5,7 @@
 #include "QtNetwork"
 #include "salonjoueurs.h"
 #include "joindrequitterwindow.h"
+#include "joueur.h"
 
 class thJeu : public QThread
 {
@@ -18,6 +19,8 @@ public:
     enum CodesClients { GamesRequest, GameCreate, GameJoin, GameSetReady, GameCData, GameQuit };
     enum CodesServeurs { GamesReply, GamePlayers, GameBegin, GameSData, GameEnd };
     bool Connexion(QString IPServeur, int PortServeur);
+    int NoArmee(QPoint);
+    QList<Joueur> joueurs;
 
 signals:
     void rGamesReply(QByteArray);
@@ -29,6 +32,8 @@ signals:
 
 private:
     void sGamesRequest();
+    int Tick;
+
 
 public slots:
     void socket_ReadyRead();
@@ -38,6 +43,7 @@ public slots:
     void eGameJoin(QString, QString);
     void eGameSetReady();
     void eGameQuit();
+    void slMouseClick(QList<QPoint>);
 };
 
 #endif // THJEU_H

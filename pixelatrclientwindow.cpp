@@ -10,9 +10,8 @@ PixelATRClientWindow::PixelATRClientWindow(QWidget *parent) :
     m_Jeu = new thJeu();
 
     timer = new QTimer(this);
-    PremierPoint = true;
 
-    connect(this, SIGNAL(siMouseClickGameData(QPoint)), m_Jeu, SLOT(slMouseClickGameData(QPoint)));
+    connect(this, SIGNAL(siMouseClick(QList<QPoint>)), m_Jeu, SLOT(slMouseClick(QList<QPoint>)));
     connect(timer, SIGNAL(timeout()), this, SLOT(slTimeOut()));
 }
 
@@ -24,11 +23,24 @@ PixelATRClientWindow::~PixelATRClientWindow()
 void PixelATRClientWindow::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
+  //  painter.setRenderHint(QPainter::Antialiasing, true);
     painter.setBrush(QBrush(Qt::darkGray));
     QRect rect(0, 0, LONGUEUR, HAUTEUR);
     painter.drawRect(rect);
     painter.setBrush(QBrush(Qt::gray, Qt::CrossPattern));
     painter.drawRect(rect);
+
+    painter.setPen(QPen(QBrush(Qt::white), 2));
+
+    for (int i = 0; i < points.count() - 1; i++)
+        painter.drawLine(points[i], points[i + 1]);
+
+    for (int i = 0; i < m_Jeu->joueurs.count(); i++)
+    {
+        painter.setPen(QPen(QBrush(m_Jeu->joueurs[i].Couleur), 4));
+        for (int j = 0; j < m_Jeu->joueurs[i].Armees.count(); j++)
+            painter.drawPoint(m_Jeu->joueurs[i].Armees[j].PosActuelle);
+    }
 
     /*
     QVector<QRect> rects = QVector<QRect>();
@@ -56,15 +68,24 @@ void PixelATRClientWindow::on_btnJoindreQuitter_clicked()
 
 void PixelATRClientWindow::mousePressEvent(QMouseEvent *event)
 {
-    QMessageBox::about(this, "", QString::number(event->pos().x()) + " , " + QString::number(event->pos().y()));
+    points.append(event->pos());
 
-    if (PremierPoint)
-        timer->start(100);
-
-    PremierPoint = !PremierPoint;
+    timer->start(10);
 }
 
 void PixelATRClientWindow::slTimeOut()
 {
-    QMessageBox::about(this, "", QString::number(this->cursor().pos().x()) + " , " + QString::number(this->cursor().pos().y()));
+    points.append(this->cursor().pos() - this->geometry().topLeft());
+    this->update();
+}
+
+void PixelATRClientWindow::mouseReleaseEvent(QMouseEvent *event)
+{
+    points.append(event->pos());
+
+    emit siMouseClick(points);
+    points.clear();
+    this->update();
+
+    timer->stop();
 }
