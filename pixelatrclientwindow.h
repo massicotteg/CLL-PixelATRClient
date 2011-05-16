@@ -28,13 +28,15 @@ protected:
 
 private slots:
     void on_btnJoindreQuitter_clicked(); 
-    void slTimeOut();
+    void slTimeOutSouris();
+    void slGameBegin();
+    void slUpdateAffichage();
 
 private:
     Ui::PixelATRClientWindow *ui;
     void paintEvent(QPaintEvent *);
     thJeu *m_Jeu;
-    QTimer *timer;
+    QTimer *timerSouris;
     QList<QPoint> points;
 };
 

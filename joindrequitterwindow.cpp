@@ -33,6 +33,9 @@ void JoindreQuitterWindow::rGamesReply(QByteArray resultat)
     QStringList Liste = buffer.split('\n');
     Liste.removeLast();
 
+    if (Liste.count() == 0)
+        QMessageBox::information(this, "Aucune partie", "Il n'y a aucune partie de créée sur le serveur");
+
     ui->lbParties->clear();
     ui->lbParties->addItems(Liste);
 }

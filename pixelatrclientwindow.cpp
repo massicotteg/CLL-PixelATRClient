@@ -9,10 +9,13 @@ PixelATRClientWindow::PixelATRClientWindow(QWidget *parent) :
     ui->setupUi(this);
     m_Jeu = new thJeu();
 
-    timer = new QTimer(this);
+    timerSouris = new QTimer(this);
 
     connect(this, SIGNAL(siMouseClick(QList<QPoint>)), m_Jeu, SLOT(slMouseClick(QList<QPoint>)));
-    connect(timer, SIGNAL(timeout()), this, SLOT(slTimeOut()));
+    connect(timerSouris, SIGNAL(timeout()), this, SLOT(slTimeOutSouris()));
+
+    connect(m_Jeu, SIGNAL(rGameBegin()), this, SLOT(slGameBegin()));
+    connect(m_Jeu, SIGNAL(siUpdateAffichage()), SLOT(slUpdateAffichage()));
 }
 
 PixelATRClientWindow::~PixelATRClientWindow()
@@ -37,9 +40,13 @@ void PixelATRClientWindow::paintEvent(QPaintEvent *)
 
     for (int i = 0; i < m_Jeu->joueurs.count(); i++)
     {
-        painter.setPen(QPen(QBrush(m_Jeu->joueurs[i].Couleur), 4));
+        QBrush brush = QBrush(m_Jeu->joueurs[i].Couleur);
         for (int j = 0; j < m_Jeu->joueurs[i].Armees.count(); j++)
-            painter.drawPoint(m_Jeu->joueurs[i].Armees[j].PosActuelle);
+        {
+            QPainterPath path = QPainterPath();
+            path.addEllipse(m_Jeu->joueurs[i].Armees[j].PosActuelle, m_Jeu->joueurs[i].Armees[j].Pixels / 10, m_Jeu->joueurs[i].Armees[j].Pixels / 10);
+            painter.fillPath(path, brush);
+        }
     }
 
     /*
@@ -68,24 +75,43 @@ void PixelATRClientWindow::on_btnJoindreQuitter_clicked()
 
 void PixelATRClientWindow::mousePressEvent(QMouseEvent *event)
 {
-    points.append(event->pos());
+    if (m_Jeu->PartieCommancee)
+    {
+        points.append(event->pos());
 
-    timer->start(10);
+        timerSouris->start(10);
+    }
 }
 
-void PixelATRClientWindow::slTimeOut()
+void PixelATRClientWindow::slTimeOutSouris()
 {
-    points.append(this->cursor().pos() - this->geometry().topLeft());
-    this->update();
+    if (m_Jeu->PartieCommancee)
+    {
+        points.append(this->cursor().pos() - this->geometry().topLeft());
+        this->update();
+    }
+}
+
+void PixelATRClientWindow::slGameBegin()
+{
+    m_Jeu->PartieCommancee = true;
 }
 
 void PixelATRClientWindow::mouseReleaseEvent(QMouseEvent *event)
 {
-    points.append(event->pos());
+    if (m_Jeu->PartieCommancee)
+    {
+        points.append(event->pos());
 
-    emit siMouseClick(points);
-    points.clear();
+        emit siMouseClick(points);
+        points.clear();
+        this->update();
+
+        timerSouris->stop();
+    }
+}
+
+void PixelATRClientWindow::slUpdateAffichage()
+{
     this->update();
-
-    timer->stop();
 }

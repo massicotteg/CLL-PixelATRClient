@@ -25,6 +25,9 @@ thJeu::thJeu(QObject *parent) :
     connect(this, SIGNAL(rGamePlayers(QByteArray)), salonJoueurs, SLOT(GamePlayers(QByteArray)));
 
     joueurs = QList<Joueur>();
+    MonNumero = 0;
+
+    PartieCommancee = false;
 }
 
 
@@ -56,6 +59,7 @@ void thJeu::socket_ReadyRead()
             emit rGameSData();
             if (resultat[1] == '0')
             {
+                int numero = 0;
                 QString buf = resultat.remove(0, 2);
                 QStringList tempTrame = buf.split('\n');
                 tempTrame.removeLast();
@@ -85,8 +89,39 @@ void thJeu::socket_ReadyRead()
 
                     joueurs.append(temp);
                     if (temp.Nom == NomJoueur)
-                        joueurs.move(i - 2, 0);
+                        MonNumero = numero;
+
+                    numero++;
                 }
+                emit siUpdateAffichage();
+            }
+            else if (resultat[1] == '1')
+            {
+                QString buf = resultat.remove(0, 2);
+                QStringList tempJoueurs = buf.split('\n');
+                tempJoueurs.removeLast();
+
+                QStringList tempArmees;
+                for (int i = 0; i < tempJoueurs.length(); i++)
+                {
+                    tempArmees = tempJoueurs[i].split('\t');
+                    tempJoueurs.removeLast();
+
+                    joueurs[i].Armees.clear();
+                    for (int j = 0; j < tempArmees.length(); j++)
+                    {
+                        QStringList tempPoints = tempArmees[j].split('\r');
+                        if (tempPoints.count() == 3)
+                        {
+                            Armee armee = Armee();
+                            armee.PosActuelle.setX(tempPoints[0].toInt());
+                            armee.PosActuelle.setY(tempPoints[1].toInt());
+                            armee.Pixels = tempPoints[2].toInt();
+                            joueurs[i].Armees.append(armee);
+                        }
+                    }
+                }
+                emit siUpdateAffichage();
             }
             break;
         case GamePlayers:
@@ -115,7 +150,7 @@ void thJeu::socket_Disconnected()
 
 void thJeu::sGamesRequest()
 {
-    socket->write(QByteArray(1, GamesRequest));
+    socket->write(QByteArray(1, GamesRequest));salonJoueurs->close();
     socket->waitForBytesWritten();
 }
 void thJeu::eGamesRequest(QString IPServeur, int PortServeur)
@@ -173,27 +208,37 @@ void thJeu::eGameQuit()
 
 void thJeu::slMouseClick(QList<QPoint> points)
 {
-    QByteArray envoi = QByteArray(1, GameCData);
-    envoi.append('\n');
-  //  envoi.append(QString::number(NoArmee(points[0])));
-    envoi.append('\n');
-    for (int i = 1; i < points.count(); i++)
+    int NoArmee = TrouveNoArmee(points[0]);
+    if (NoArmee != -1)
     {
-        envoi.append(QString::number(points[i].x()));
-        envoi.append('\r');
-        envoi.append(QString::number(points[i].y()));
-        envoi.append('\t');
+        QByteArray envoi = QByteArray(1, GameCData);
+        envoi.append('\n');
+        envoi.append(QString::number(NoArmee));
+        envoi.append('\n');
+        for (int i = 1; i < points.count(); i++)
+        {
+            envoi.append(QString::number(points[i].x()));
+            envoi.append('\t');
+            envoi.append(QString::number(points[i].y()));
+            envoi.append('\t');
+        }
+        envoi.append('\n');
+        envoi.append(Tick);
+        socket->write(envoi);
     }
-    envoi.append('\n');
-    envoi.append(Tick);
-    socket->write(envoi);
 }
 
-int thJeu::NoArmee(QPoint point)
+int thJeu::TrouveNoArmee(QPoint point)
 {
     int i = 0;
+    QPainterPath regionArmee;
 
-    // code
+    do
+    {
+        regionArmee = QPainterPath();
+        regionArmee.addEllipse(joueurs[MonNumero].Armees[i].PosActuelle, joueurs[MonNumero].Armees[i].Pixels / 10, joueurs[MonNumero].Armees[i].Pixels / 10);
+    }
+    while (!regionArmee.intersects(QRect(point, point)) && ++i < joueurs[MonNumero].Armees.count());
 
-    return i == joueurs[0].Armees.count() ? -1 : i;
+    return i == joueurs[MonNumero].Armees.count() ? -1 : i;
 }

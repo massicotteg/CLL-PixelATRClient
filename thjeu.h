@@ -19,8 +19,10 @@ public:
     enum CodesClients { GamesRequest, GameCreate, GameJoin, GameSetReady, GameCData, GameQuit };
     enum CodesServeurs { GamesReply, GamePlayers, GameBegin, GameSData, GameEnd };
     bool Connexion(QString IPServeur, int PortServeur);
-    int NoArmee(QPoint);
+    int TrouveNoArmee(QPoint);
     QList<Joueur> joueurs;
+    int MonNumero;
+    bool PartieCommancee;
 
 signals:
     void rGamesReply(QByteArray);
@@ -29,6 +31,7 @@ signals:
     void rGameSData();
     void rGameEnd();
     void BadConnection();
+    void siUpdateAffichage();
 
 private:
     void sGamesRequest();
