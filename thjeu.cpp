@@ -62,6 +62,74 @@ int thJeu::ToInt(QByteArray Data)
         Res += d[I];
     return Res;
 }
+void thJeu::TraitementGameSData(QByteArray resultat)
+{
+    if (resultat[1] == '0')
+    {
+        int numero = 0;
+        QString buf = resultat.remove(0, 2);
+        QStringList tempTrame = buf.split('\n');
+        tempTrame.removeLast();
+
+        // Liste d'obstacles
+
+        QStringList tempJoueurs;
+        for (int i = 2; i< tempTrame.length(); i++)
+        {
+            tempJoueurs = tempTrame[i].split('\t');
+            tempJoueurs.removeLast();
+
+            Joueur temp;
+            temp.Nom = tempJoueurs[0];
+            temp.Couleur = (Qt::GlobalColor) tempJoueurs[1].toInt();
+
+            QStringList tempArmee;
+            for (int j = 2; j < tempJoueurs.length(); j++)
+            {
+                Armee armee;
+                tempArmee = tempJoueurs[j].split('\r');
+                armee.PosActuelle.setX(tempArmee[0].toInt());
+                armee.PosActuelle.setY(tempArmee[1].toInt());
+                armee.Pixels = tempArmee[2].toInt();
+                temp.Armees.append(armee);
+            }
+
+            joueurs.append(temp);
+            if (temp.Nom == NomJoueur)
+                MonNumero = numero;
+
+            numero++;
+        }
+    }
+    else if (resultat[1] == '1')
+    {
+        QString buf = resultat.remove(0, 2);
+        QStringList tempJoueurs = buf.split('\n');
+        tempJoueurs.removeLast();
+
+        QStringList tempArmees;
+        for (int i = 0; i < tempJoueurs.length(); i++)
+        {
+            tempArmees = tempJoueurs[i].split('\t');
+            tempArmees.removeLast();
+
+            joueurs[i].Armees.clear();
+            for (int j = 0; j < tempArmees.length(); j++)
+            {
+                QStringList tempPoints = tempArmees[j].split('\r');
+                if (tempPoints.count() == 3)
+                {
+                    Armee armee = Armee();
+                    armee.PosActuelle.setX(tempPoints[0].toInt());
+                    armee.PosActuelle.setY(tempPoints[1].toInt());
+                    armee.Pixels = tempPoints[2].toInt();
+                    joueurs[i].Armees.append(armee);
+                }
+            }
+        }
+    }
+    emit siUpdateAffichage();
+}
 void thJeu::socket_ReadyRead()
 {
     QByteArray resultat = socket->read(ToInt(socket->read(4)));
@@ -69,72 +137,7 @@ void thJeu::socket_ReadyRead()
     {
         case GameSData:
             emit rGameSData();
-            if (resultat[1] == '0')
-            {
-                int numero = 0;
-                QString buf = resultat.remove(0, 2);
-                QStringList tempTrame = buf.split('\n');
-                tempTrame.removeLast();
-
-                // Liste d'obstacles
-
-                QStringList tempJoueurs;
-                for (int i = 2; i< tempTrame.length(); i++)
-                {
-                    tempJoueurs = tempTrame[i].split('\t');
-                    tempJoueurs.removeLast();
-
-                    Joueur temp;
-                    temp.Nom = tempJoueurs[0];
-                    temp.Couleur = (Qt::GlobalColor) tempJoueurs[1].toInt();
-
-                    QStringList tempArmee;
-                    for (int j = 2; j < tempJoueurs.length(); j++)
-                    {
-                        Armee armee;
-                        tempArmee = tempJoueurs[j].split('\r');
-                        armee.PosActuelle.setX(tempArmee[0].toInt());
-                        armee.PosActuelle.setY(tempArmee[1].toInt());
-                        armee.Pixels = tempArmee[2].toInt();
-                        temp.Armees.append(armee);
-                    }
-
-                    joueurs.append(temp);
-                    if (temp.Nom == NomJoueur)
-                        MonNumero = numero;
-
-                    numero++;
-                }
-                emit siUpdateAffichage();
-            }
-            else if (resultat[1] == '1')
-            {
-                QString buf = resultat.remove(0, 2);
-                QStringList tempJoueurs = buf.split('\n');
-                tempJoueurs.removeLast();
-
-                QStringList tempArmees;
-                for (int i = 0; i < tempJoueurs.length(); i++)
-                {
-                    tempArmees = tempJoueurs[i].split('\t');
-                    tempJoueurs.removeLast();
-
-                    joueurs[i].Armees.clear();
-                    for (int j = 0; j < tempArmees.length(); j++)
-                    {
-                        QStringList tempPoints = tempArmees[j].split('\r');
-                        if (tempPoints.count() == 3)
-                        {
-                            Armee armee = Armee();
-                            armee.PosActuelle.setX(tempPoints[0].toInt());
-                            armee.PosActuelle.setY(tempPoints[1].toInt());
-                            armee.Pixels = tempPoints[2].toInt();
-                            joueurs[i].Armees.append(armee);
-                        }
-                    }
-                }
-                emit siUpdateAffichage();
-            }
+            TraitementGameSData(resultat);
             break;
         case GamePlayers:
             emit rGamePlayers(resultat);
@@ -160,9 +163,21 @@ void thJeu::socket_Disconnected()
     salonJoueurs->close();
 }
 
+QByteArray thJeu::ToQByteArray(int Longueur)
+{
+    QByteArray Res = QByteArray(1, ((char)(Longueur >> 24)));
+    Res.append(QByteArray(1, ((char)(Longueur >> 16))));
+    Res.append(QByteArray(1, ((char)(Longueur >> 8))));
+    Res.append(QByteArray(1, (char)(Longueur)));
+    return  Res;
+}
 void thJeu::sGamesRequest()
 {
-    socket->write(QByteArray(1, GamesRequest));salonJoueurs->close();
+    QByteArray envoie = QByteArray(1, GamesRequest);
+
+    envoie.insert(0, ToQByteArray(envoie.count()));
+    socket->write(envoie);
+    salonJoueurs->close();
     socket->waitForBytesWritten();
 }
 void thJeu::eGamesRequest(QString IPServeur, int PortServeur)
@@ -181,6 +196,8 @@ void thJeu::eGameCreate(QString IPServeur, int PortServeur, QString Partie, char
     {
         QByteArray envoie = QByteArray(1, GameCreate);
         envoie.append(Partie + '\n' + NoMap);
+
+        envoie.insert(0, ToQByteArray(envoie.count()));
         socket->write(envoie);
         socket->waitForBytesWritten();
 
@@ -194,10 +211,11 @@ void thJeu::eGameJoin(QString nomJoueur, QString Partie)
     {
         NomJoueur = nomJoueur;
 
-        QByteArray envoi = QByteArray(1, GameJoin);
-        envoi.append(NomJoueur + '\n' + Partie);
+        QByteArray envoie = QByteArray(1, GameJoin);
+        envoie.append(NomJoueur + '\n' + Partie);
 
-        socket->write(envoi);
+        envoie.insert(0, ToQByteArray(envoie.count()));
+        socket->write(envoie);
         socket->waitForBytesWritten();
     }
 
@@ -206,13 +224,19 @@ void thJeu::eGameJoin(QString nomJoueur, QString Partie)
 
 void thJeu::eGameSetReady()
 {
-    socket->write(QByteArray(1, GameSetReady));
+    QByteArray envoie = QByteArray(1, GameSetReady);
+
+    envoie.insert(0, ToQByteArray(envoie.count()));
+    socket->write(envoie);
     socket->waitForBytesWritten();
 }
 
 void thJeu::eGameQuit()
 {
-    socket->write(QByteArray(1, GameQuit));
+    QByteArray envoie = QByteArray(1, GameQuit);
+
+    envoie.insert(0, ToQByteArray(envoie.count()));
+    socket->write(envoie);
     socket->waitForBytesWritten();
     joindreQuitterWindow->Voulue = true;
     socket->disconnectFromHost();
@@ -223,20 +247,23 @@ void thJeu::slMouseClick(QList<QPoint> points)
     int NoArmee = TrouveNoArmee(points[0]);
     if (NoArmee != -1)
     {
-        QByteArray envoi = QByteArray(1, GameCData);
-        envoi.append('\n');
-        envoi.append(QString::number(NoArmee));
-        envoi.append('\n');
+        QByteArray envoie = QByteArray(1, GameCData);
+        envoie.append('\n');
+        envoie.append(QString::number(NoArmee));
+        envoie.append('\n');
         for (int i = 1; i < points.count(); i++)
         {
-            envoi.append(QString::number(points[i].x()));
-            envoi.append('\t');
-            envoi.append(QString::number(points[i].y()));
-            envoi.append('\t');
+            envoie.append(QString::number(points[i].x()));
+            envoie.append('\t');
+            envoie.append(QString::number(points[i].y()));
+            envoie.append('\t');
         }
-        envoi.append('\n');
-        envoi.append(Tick);
-        socket->write(envoi);
+        envoie.append('\n');
+        envoie.append(Tick);
+
+        envoie.insert(0, ToQByteArray(envoie.count()));
+        socket->write(envoie);
+        socket->waitForBytesWritten();
     }
 }
 
