@@ -38,6 +38,7 @@ private:
     thJeu *m_Jeu;
     QTimer *timerSouris;
     QList<QPoint> points;
+    void AjoutPoint(QPoint pt);
 };
 
 #endif // PIXELATRCLIENTWINDOW_H

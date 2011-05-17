@@ -13,7 +13,6 @@ PixelATRClientWindow::PixelATRClientWindow(QWidget *parent) :
 
     connect(this, SIGNAL(siMouseClick(QList<QPoint>)), m_Jeu, SLOT(slMouseClick(QList<QPoint>)));
     connect(timerSouris, SIGNAL(timeout()), this, SLOT(slTimeOutSouris()));
-
     connect(m_Jeu, SIGNAL(rGameBegin()), this, SLOT(slGameBegin()));
     connect(m_Jeu, SIGNAL(siUpdateAffichage()), SLOT(slUpdateAffichage()));
 }
@@ -27,6 +26,8 @@ void PixelATRClientWindow::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
   //  painter.setRenderHint(QPainter::Antialiasing, true);
+
+    // Arrière-plan de la fenêtre
     painter.setBrush(QBrush(Qt::darkGray));
     QRect rect(0, 0, LONGUEUR, HAUTEUR);
     painter.drawRect(rect);
@@ -73,11 +74,17 @@ void PixelATRClientWindow::on_btnJoindreQuitter_clicked()
     m_Jeu->joindreQuitterWindow->show();
 }
 
+void PixelATRClientWindow::AjoutPoint(QPoint pt)
+{
+    if (pt.x() < LONGUEUR && pt.y() < HAUTEUR)
+        points.append(pt);
+}
+
 void PixelATRClientWindow::mousePressEvent(QMouseEvent *event)
 {
     if (m_Jeu->PartieCommancee)
     {
-        points.append(event->pos());
+        AjoutPoint(event->pos());
 
         timerSouris->start(10);
     }
@@ -87,7 +94,7 @@ void PixelATRClientWindow::slTimeOutSouris()
 {
     if (m_Jeu->PartieCommancee)
     {
-        points.append(this->cursor().pos() - this->geometry().topLeft());
+        AjoutPoint(this->cursor().pos() - this->geometry().topLeft());
         this->update();
     }
 }
@@ -101,7 +108,7 @@ void PixelATRClientWindow::mouseReleaseEvent(QMouseEvent *event)
 {
     if (m_Jeu->PartieCommancee)
     {
-        points.append(event->pos());
+        AjoutPoint(event->pos());
 
         emit siMouseClick(points);
         points.clear();
