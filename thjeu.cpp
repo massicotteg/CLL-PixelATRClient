@@ -50,9 +50,21 @@ bool thJeu::Connexion(QString IPServeur, int PortServeur)
         return true;
 }
 
+int thJeu::ToInt(QByteArray Data)
+{
+    int d[4];
+    int Res = 0;
+    d[0] = (((int)((uchar)Data[0])) << 24);
+    d[1] = (((int)((uchar)Data[1])) << 16);
+    d[2] = (((int)((uchar)Data[2])) << 8);
+    d[3] = ((int)((uchar)Data[3]));
+    for (int I = 0; I < 4; I++)
+        Res += d[I];
+    return Res;
+}
 void thJeu::socket_ReadyRead()
 {
-    QByteArray resultat = socket->readAll();
+    QByteArray resultat = socket->read(ToInt(socket->read(4)));
     switch (resultat[0])
     {
         case GameSData:

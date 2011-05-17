@@ -36,6 +36,7 @@ signals:
 private:
     void sGamesRequest();
     int Tick;
+    int ToInt(QByteArray);
 
 
 public slots:
