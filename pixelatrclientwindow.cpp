@@ -36,6 +36,7 @@ void PixelATRClientWindow::paintEvent(QPaintEvent *)
 
     painter.setPen(QPen(QBrush(Qt::white), 2));
 
+    // Dessin de la ligne de trajectoire
     for (int i = 0; i < points.count() - 1; i++)
         painter.drawLine(points[i], points[i + 1]);
 
@@ -71,7 +72,7 @@ void PixelATRClientWindow::on_btnJoindreQuitter_clicked()
 
 void PixelATRClientWindow::AjoutPoint(QPoint pt)
 {
-    if (pt.x() < LONGUEUR && pt.y() < HAUTEUR)
+    if (pt.x() < LONGUEUR && pt.y() < HAUTEUR && pt.x() > 0 && pt.y() > 0)
         points.append(pt);
 }
 

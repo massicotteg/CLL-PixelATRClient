@@ -80,17 +80,35 @@ void thJeu::TraitementGameSData(QByteArray resultat)
             tempJoueurs.removeLast();
 
             Joueur temp;
-            temp.Nom = tempJoueurs[0];
-            temp.Couleur = (Qt::GlobalColor) tempJoueurs[1].toInt();
+
+            if (tempJoueurs.count() >= 2)
+            {
+                temp.Nom = tempJoueurs[0];
+                temp.Couleur = (Qt::GlobalColor) tempJoueurs[1].toInt();
+            }
+            else
+            {
+                temp.Nom = "";
+                temp.Couleur = Qt::white;
+            }
 
             QStringList tempArmee;
             for (int j = 2; j < tempJoueurs.length(); j++)
             {
                 Armee armee;
                 tempArmee = tempJoueurs[j].split('\r');
-                armee.PosActuelle.setX(tempArmee[0].toInt());
-                armee.PosActuelle.setY(tempArmee[1].toInt());
-                armee.Pixels = tempArmee[2].toInt();
+                if (tempArmee.count() >= 3)
+                {
+                    armee.PosActuelle.setX(tempArmee[0].toInt());
+                    armee.PosActuelle.setY(tempArmee[1].toInt());
+                    armee.Pixels = tempArmee[2].toInt();
+                }
+                else
+                {
+                   armee.PosActuelle.setX(0);
+                   armee.PosActuelle.setY(0);
+                   armee.Pixels = 0;
+                }
                 temp.Armees.append(armee);
             }
 
@@ -117,14 +135,22 @@ void thJeu::TraitementGameSData(QByteArray resultat)
             for (int j = 0; j < tempArmees.length(); j++)
             {
                 QStringList tempPoints = tempArmees[j].split('\r');
-                if (tempPoints.count() == 3)
-                {
-                    Armee armee = Armee();
+                Armee armee = Armee();
+
+                if (tempPoints.count() >= 3)
+                {  
                     armee.PosActuelle.setX(tempPoints[0].toInt());
                     armee.PosActuelle.setY(tempPoints[1].toInt());
                     armee.Pixels = tempPoints[2].toInt();
-                    joueurs[i].Armees.append(armee);
+
                 }
+                else
+                {
+                    armee.PosActuelle.setX(0);
+                    armee.PosActuelle.setY(0);
+                    armee.Pixels = 0;
+                }
+                joueurs[i].Armees.append(armee);
             }
         }
     }
@@ -154,6 +180,8 @@ void thJeu::socket_ReadyRead()
             emit rGameEnd();
             joindreQuitterWindow->Voulue = true;
             socket->disconnectFromHost();
+            joueurs.clear();
+            emit siUpdateAffichage();
             break;
     }
 }
