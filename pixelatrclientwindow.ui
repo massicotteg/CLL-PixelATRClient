@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>941</width>
+    <width>1222</width>
     <height>702</height>
    </rect>
   </property>
@@ -70,6 +70,25 @@
       <string>Menu d'améliorations</string>
      </property>
     </widget>
+   </widget>
+   <widget class="QLabel" name="lblListeJoueurs">
+    <property name="geometry">
+     <rect>
+      <x>960</x>
+      <y>10</y>
+      <width>161</width>
+      <height>681</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Liste des joueurs:</string>
+    </property>
+    <property name="textFormat">
+     <enum>Qt::RichText</enum>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+    </property>
    </widget>
   </widget>
  </widget>

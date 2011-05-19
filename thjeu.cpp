@@ -275,7 +275,7 @@ int thJeu::TrouveNoArmee(QPoint point)
     do
     {
         regionArmee = QPainterPath();
-        regionArmee.addEllipse(joueurs[MonNumero].Armees[i].PosActuelle, joueurs[MonNumero].Armees[i].Pixels / 10, joueurs[MonNumero].Armees[i].Pixels / 10);
+        regionArmee.addEllipse(joueurs[MonNumero].Armees[i].PosActuelle, -20 * pow(2, -joueurs[MonNumero].Armees[i].Pixels / 250.0) + 25, -20 * pow(2, -joueurs[MonNumero].Armees[i].Pixels / 250.0) + 25);
     }
     while (!regionArmee.intersects(QRect(point, point)) && ++i < joueurs[MonNumero].Armees.count());
 

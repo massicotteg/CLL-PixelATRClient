@@ -42,31 +42,26 @@ void PixelATRClientWindow::paintEvent(QPaintEvent *)
     for (int i = 0; i < m_Jeu->joueurs.count(); i++)
     {
         QBrush brush = QBrush(m_Jeu->joueurs[i].Couleur);
-        for (int j = 0; j < m_Jeu->joueurs[i].Armees.count(); j++)
+        painter.setPen(m_Jeu->joueurs[i].Couleur);
+
+        // Dessin de la base
+        QRect rect(m_Jeu->joueurs[i].Armees[0].PosActuelle.x(), m_Jeu->joueurs[i].Armees[0].PosActuelle.y(), -20 * pow(2, -m_Jeu->joueurs[i].Armees[0].Pixels / 250.0) + 25, -20 * pow(2, -m_Jeu->joueurs[i].Armees[0].Pixels / 250.0) + 25);
+        painter.fillRect(rect, brush);
+
+        // Dessin des autres armées
+        for (int j = 1; j < m_Jeu->joueurs[i].Armees.count(); j++)
         {
             QPainterPath path = QPainterPath();
-            path.addEllipse(m_Jeu->joueurs[i].Armees[j].PosActuelle, m_Jeu->joueurs[i].Armees[j].Pixels / 10, m_Jeu->joueurs[i].Armees[j].Pixels / 10);
+            path.addEllipse(m_Jeu->joueurs[i].Armees[j].PosActuelle, -20 * pow(2, -m_Jeu->joueurs[i].Armees[j].Pixels / 250.0) + 25, -20 * pow(2, -m_Jeu->joueurs[i].Armees[j].Pixels / 250.0) + 25);
             painter.fillPath(path, brush);
         }
     }
 
-    /*
-    QVector<QRect> rects = QVector<QRect>();
-    rects.append(QRect(10, 10, 2, 2));
-    rects.append(QRect(50, 50, 2, 2));
-
-    painter.setBrush(QBrush(Qt::yellow));
-    painter.setPen(QPen(Qt::yellow));
-    painter.drawRects(rects);
-
-    rects.clear();
-    painter.setBrush(QBrush(Qt::red));
-    painter.setPen(QPen(Qt::red));
-
-    rects.append(QRect(30, 50, 2, 2));
-    rects.append(QRect(90, 20, 2, 2));
-    painter.drawRects(rects);
-    */
+    for (int i = 0; i < m_Jeu->joueurs.count(); i++)
+    {
+        painter.setPen(m_Jeu->joueurs[i].Couleur);
+        painter.drawText(LONGUEUR + 10, 45 + 20 * i, m_Jeu->joueurs[i].Nom + (m_Jeu->joueurs[i].Nom == m_Jeu->NomJoueur ? " <<" : ""));
+    }
 }
 
 void PixelATRClientWindow::on_btnJoindreQuitter_clicked()
