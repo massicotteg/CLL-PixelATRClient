@@ -178,10 +178,7 @@ void thJeu::socket_ReadyRead()
             break;
         case GameEnd:
             emit rGameEnd();
-            joindreQuitterWindow->Voulue = true;
-            socket->disconnectFromHost();
-            joueurs.clear();
-            emit siUpdateAffichage();
+            FonctionGameEnd();
             break;
     }
 }
@@ -319,4 +316,26 @@ int thJeu::TrouveNoArmee(QPoint point)
     while (!regionArmee.intersects(QRect(point, point)) && ++i < joueurs[MonNumero].Armees.count());
 
     return i == joueurs[MonNumero].Armees.count() ? -1 : i;
+}
+
+void thJeu::FonctionGameEnd()
+{
+    QString Gagnant = "";
+    int i = 0;
+
+    while (Gagnant == "" && i < joueurs.count())
+    {
+        if (joueurs[i].Armees.count() > 1)
+            Gagnant = joueurs[i].Nom;
+    }
+
+    if (Gagnant == joueurs[MonNumero].Nom)
+        QMessageBox::about(joindreQuitterWindow, "Victoire!", "Vous avez gagné!");
+    else
+        QMessageBox::about(joindreQuitterWindow, "Défaite", "Le joueur " + Gagnant + " a remporté!");
+
+    joindreQuitterWindow->Voulue = true;
+    socket->disconnectFromHost();
+    joueurs.clear();
+    emit siUpdateAffichage();
 }

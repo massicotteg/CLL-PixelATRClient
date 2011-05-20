@@ -39,6 +39,7 @@ private:
     QByteArray ToQByteArray(int);
     int ToInt(QByteArray);
     void TraitementGameSData(QByteArray);
+    void FonctionGameEnd();
 
 
 public slots:

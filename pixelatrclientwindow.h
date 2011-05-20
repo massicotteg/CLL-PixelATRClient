@@ -25,6 +25,7 @@ signals:
 protected:
     void mousePressEvent(QMouseEvent *);
     void mouseReleaseEvent(QMouseEvent *);
+    void closeEvent(QCloseEvent *);
 
 private slots:
     void on_btnJoindreQuitter_clicked(); 

@@ -60,14 +60,24 @@ void PixelATRClientWindow::paintEvent(QPaintEvent *)
 
     for (int i = 0; i < m_Jeu->joueurs.count(); i++)
     {
-        painter.setPen(m_Jeu->joueurs[i].Couleur);
-        painter.drawText(LONGUEUR + 10, 45 + 20 * i, m_Jeu->joueurs[i].Nom + (m_Jeu->joueurs[i].Nom == m_Jeu->NomJoueur ? " <<" : ""));
+        if (m_Jeu->joueurs[i].Armees.count() > 1)
+        {
+            painter.setPen(m_Jeu->joueurs[i].Couleur);
+            painter.drawText(LONGUEUR + 10, 45 + 20 * i, m_Jeu->joueurs[i].Nom + (m_Jeu->joueurs[i].Nom == m_Jeu->NomJoueur ? " <<" : ""));
+        }
     }
 }
 
 void PixelATRClientWindow::on_btnJoindreQuitter_clicked()
 {
-    m_Jeu->joindreQuitterWindow->show();
+    if (m_Jeu->PartieCommancee)
+    {
+        m_Jeu->socket->write(QByteArray(1, m_Jeu->GameQuit));
+        m_Jeu->socket->waitForBytesWritten();
+        m_Jeu->socket->disconnectFromHost();
+    }
+    else
+        m_Jeu->joindreQuitterWindow->show();
 }
 
 void PixelATRClientWindow::AjoutPoint(QPoint pt)
@@ -117,4 +127,11 @@ void PixelATRClientWindow::mouseReleaseEvent(QMouseEvent *event)
 void PixelATRClientWindow::slUpdateAffichage()
 {
     this->update();
+}
+
+void PixelATRClientWindow::closeEvent(QCloseEvent *)
+{
+    m_Jeu->socket->write(QByteArray(1, m_Jeu->GameQuit));
+    m_Jeu->socket->waitForBytesWritten();
+    m_Jeu->socket->disconnectFromHost();
 }
