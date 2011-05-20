@@ -189,6 +189,11 @@ void thJeu::socket_Disconnected()
 {
     NomJoueur = "";
     salonJoueurs->close();
+    PartieCommancee = false;
+    joueurs.clear();
+    delete salonJoueurs;
+    salonJoueurs = new SalonJoueurs();
+    emit siUpdateAffichage();
 }
 
 QByteArray thJeu::ToQByteArray(int Longueur)
