@@ -192,7 +192,13 @@ void thJeu::socket_Disconnected()
     PartieCommancee = false;
     joueurs.clear();
     delete salonJoueurs;
+
     salonJoueurs = new SalonJoueurs();
+    connect(salonJoueurs, SIGNAL(SetReady()), this, SLOT(eGameSetReady()));
+    connect(salonJoueurs, SIGNAL(Quit()), this, SLOT(eGameQuit()));
+
+    connect(this, SIGNAL(rGamePlayers(QByteArray)), salonJoueurs, SLOT(GamePlayers(QByteArray)));
+
     emit siUpdateAffichage();
 }
 
