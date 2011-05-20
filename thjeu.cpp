@@ -280,26 +280,29 @@ void thJeu::eGameQuit()
 
 void thJeu::slMouseClick(QList<QPoint> points)
 {
-    int NoArmee = TrouveNoArmee(points[0]);
-    if (NoArmee != -1)
+    if (points.count() > 0)
     {
-        QByteArray envoie = QByteArray(1, GameCData);
-        envoie.append('\n');
-        envoie.append(QString::number(NoArmee));
-        envoie.append('\n');
-        for (int i = 1; i < points.count(); i++)
+        int NoArmee = TrouveNoArmee(points[0]);
+        if (NoArmee != -1)
         {
-            envoie.append(QString::number(points[i].x()));
-            envoie.append('\t');
-            envoie.append(QString::number(points[i].y()));
-            envoie.append('\t');
-        }
-        envoie.append('\n');
-        envoie.append(Tick);
+            QByteArray envoie = QByteArray(1, GameCData);
+            envoie.append('\n');
+            envoie.append(QString::number(NoArmee));
+            envoie.append('\n');
+            for (int i = 1; i < points.count(); i++)
+            {
+                envoie.append(QString::number(points[i].x()));
+                envoie.append('\t');
+                envoie.append(QString::number(points[i].y()));
+                envoie.append('\t');
+            }
+            envoie.append('\n');
+            envoie.append(Tick);
 
-        envoie.insert(0, ToQByteArray(envoie.count()));
-        socket->write(envoie);
-        socket->waitForBytesWritten();
+            envoie.insert(0, ToQByteArray(envoie.count()));
+            socket->write(envoie);
+            socket->waitForBytesWritten();
+        }
     }
 }
 
@@ -327,6 +330,7 @@ void thJeu::FonctionGameEnd()
     {
         if (joueurs[i].Armees.count() > 1)
             Gagnant = joueurs[i].Nom;
+        i++;
     }
 
     if (Gagnant == joueurs[MonNumero].Nom)

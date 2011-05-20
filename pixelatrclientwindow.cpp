@@ -15,6 +15,8 @@ PixelATRClientWindow::PixelATRClientWindow(QWidget *parent) :
     connect(timerSouris, SIGNAL(timeout()), this, SLOT(slTimeOutSouris()));
     connect(m_Jeu, SIGNAL(rGameBegin()), this, SLOT(slGameBegin()));
     connect(m_Jeu, SIGNAL(siUpdateAffichage()), SLOT(slUpdateAffichage()));
+
+    points = QList<QPoint>();
 }
 
 PixelATRClientWindow::~PixelATRClientWindow()
@@ -88,6 +90,7 @@ void PixelATRClientWindow::AjoutPoint(QPoint pt)
 
 void PixelATRClientWindow::mousePressEvent(QMouseEvent *event)
 {
+    qDebug() << "mousePressEvent";
     if (m_Jeu->PartieCommancee)
     {
         AjoutPoint(event->pos());
@@ -98,6 +101,7 @@ void PixelATRClientWindow::mousePressEvent(QMouseEvent *event)
 
 void PixelATRClientWindow::slTimeOutSouris()
 {
+    qDebug() << "slTimeOutSouris";
     if (m_Jeu->PartieCommancee)
     {
         AjoutPoint(this->cursor().pos() - this->geometry().topLeft());
@@ -112,6 +116,7 @@ void PixelATRClientWindow::slGameBegin()
 
 void PixelATRClientWindow::mouseReleaseEvent(QMouseEvent *event)
 {
+    qDebug() << "mouseReleaseEvent";
     if (m_Jeu->PartieCommancee)
     {
         AjoutPoint(event->pos());
