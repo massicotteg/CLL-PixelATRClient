@@ -49,14 +49,14 @@ bool thJeu::Connexion(QString IPServeur, int PortServeur)
         return true;
 }
 
-int thJeu::ToInt(QByteArray Data)
+int thJeu::ToInt(QByteArray Donnees)
 {
     int d[4];
     int Res = 0;
-    d[0] = (((int)((uchar)Data[0])) << 24);
-    d[1] = (((int)((uchar)Data[1])) << 16);
-    d[2] = (((int)((uchar)Data[2])) << 8);
-    d[3] = ((int)((uchar)Data[3]));
+    d[0] = (((int)((uchar)Donnees[0])) << 24);
+    d[1] = (((int)((uchar)Donnees[1])) << 16);
+    d[2] = (((int)((uchar)Donnees[2])) << 8);
+    d[3] = ((int)((uchar)Donnees[3]));
     for (int I = 0; I < 4; I++)
         Res += d[I];
     return Res;
@@ -187,6 +187,7 @@ void thJeu::m_socket_Disconnected()
     m_salonJoueurs->close();
     m_PartieCommancee = false;
     m_joueurs.clear();
+
     delete m_salonJoueurs;
 
     m_salonJoueurs = new SalonJoueurs();
