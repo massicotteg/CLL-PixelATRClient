@@ -17,13 +17,13 @@ public:
     ~SalonJoueurs();
 
 signals:
-    void SetReady();
-    void Quit();
+    void siPret();
+    void Quitter();
 
 private slots:
     void on_btnPret_clicked();
     void on_btnQuitter_clicked();
-    void GamePlayers(QByteArray resultat);
+    void rJoueursPartie(QByteArray resultat);
 
 private:
     Ui::SalonJoueurs *ui;

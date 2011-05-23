@@ -10,7 +10,7 @@ JoindreQuitterWindow::JoindreQuitterWindow(QWidget *parent) :
     ui(new Ui::JoindreQuitterWindow)
 {
     ui->setupUi(this);
-    Voulue = false;
+    m_Voulue = false;
 }
 
 JoindreQuitterWindow::~JoindreQuitterWindow()
@@ -18,40 +18,41 @@ JoindreQuitterWindow::~JoindreQuitterWindow()
     delete ui;
 }
 
-void JoindreQuitterWindow::BadConnection()
+void JoindreQuitterWindow::ConnexionImpossible()
 {
     ui->lbParties->clear();
     QMessageBox::information(this, "Erreur", "Impossible de se connecter au serveur");
 }
 void JoindreQuitterWindow::on_btnAfficherParties_clicked()
 {
-    emit eGamesRequest(ui->txtAdresseServeur->text(), ui->txtPort->text().toInt());
+    emit eDemandeParties(ui->txtAdresseServeur->text(), ui->txtPort->text().toInt());
 }
-void JoindreQuitterWindow::rGamesReply(QByteArray resultat)
+void JoindreQuitterWindow::rReponseParties(QByteArray resultat)
 {
     QString buffer = resultat.remove(0, 1);
     QStringList Liste = buffer.split('\n');
     Liste.removeLast();
 
-    if (Liste.count() == 0)
-        QMessageBox::information(this, "Aucune partie", "Il n'y a aucune partie de créée sur le serveur");
-
     ui->lbParties->clear();
-    ui->lbParties->addItems(Liste);
+
+    if (Liste.count() == 0)
+        QMessageBox::information(this, "Aucune partie", "Il n'y a aucune partie de creee sur le serveur");
+    else
+        ui->lbParties->addItems(Liste);
 }
 
 void JoindreQuitterWindow::on_btnNouvellePartie_clicked()
 {
-    emit eGameCreate(ui->txtAdresseServeur->text(), ui->txtPort->text().toInt(),
+    emit eCreePartie(ui->txtAdresseServeur->text(), ui->txtPort->text().toInt(),
                 QInputDialog::getText(this, "Nouvelle partie", "Nom", QLineEdit::Normal, "Partie sans nom"),
-                (char)QInputDialog::getInt(this, "Nouvelle partie", "Taille de la map", MAP_DEFAULT, MAP_MIN, MAP_MAX));
+                (char)100);//(char)QInputDialog::getInt(this, "Nouvelle partie", "Taille de la map", MAP_DEFAULT, MAP_MIN, MAP_MAX));
 }
 
 void JoindreQuitterWindow::on_btnJoindre_clicked()
 {
     if (ui->txtNomJoueur->text() != "")
     {
-        emit eGameJoin(ui->txtNomJoueur->text(), ui->lbParties->currentItem()->text());
+        emit eJoinPartie(ui->txtNomJoueur->text(), ui->lbParties->currentItem()->text());
         ui->txtNomJoueur->setEnabled(false);
     }
     else
@@ -60,9 +61,9 @@ void JoindreQuitterWindow::on_btnJoindre_clicked()
 
 void JoindreQuitterWindow::slDisconnected()
 {
-    if (!Voulue)
-        QMessageBox::critical(this, "Erreur CRITIQUE !!!", "Vous avez été déconnecté du serveur !!!");
-    Voulue = false;
+    if (!m_Voulue)
+        QMessageBox::critical(this, "Connection interrompue !!!", "Vous avez ete deconnecte du serveur !!!");
+    m_Voulue = false;
     ui->lbParties->clear();
     ui->btnJoindre->setEnabled(false);
     ui->txtNomJoueur->setEnabled(true);

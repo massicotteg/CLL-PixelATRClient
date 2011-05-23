@@ -1,50 +1,49 @@
 #include "thjeu.h"
 
-thJeu::thJeu(QObject *parent) :
-    QThread(parent)
+thJeu::thJeu()
 {
-    socket = new QTcpSocket();
+    m_socket = new QTcpSocket();
 
-    joindreQuitterWindow = new JoindreQuitterWindow();
-    salonJoueurs = new SalonJoueurs();
+    m_joindreQuitterWindow = new JoindreQuitterWindow();
+    m_salonJoueurs = new SalonJoueurs();
 
-    connect(socket, SIGNAL(readyRead()), this, SLOT(socket_ReadyRead()));
-    connect(socket, SIGNAL(disconnected()), this, SLOT(socket_Disconnected()));
-    connect(socket, SIGNAL(disconnected()), joindreQuitterWindow, SLOT(slDisconnected()));
+    connect(m_socket, SIGNAL(readyRead()), this, SLOT(m_socket_ReadyRead()));
+    connect(m_socket, SIGNAL(disconnected()), this, SLOT(m_socket_Disconnected()));
+    connect(m_socket, SIGNAL(disconnected()), m_joindreQuitterWindow, SLOT(slDisconnected()));
 
-    connect(this, SIGNAL(BadConnection()), joindreQuitterWindow, SLOT(BadConnection()));
-    connect(joindreQuitterWindow, SIGNAL(eGamesRequest(QString,int)), this, SLOT(eGamesRequest(QString,int)));
-    connect(joindreQuitterWindow, SIGNAL(eGameCreate(QString,int,QString,char)), this, SLOT(eGameCreate(QString,int,QString,char)));
-    connect(joindreQuitterWindow, SIGNAL(eGameJoin(QString,QString)), this, SLOT(eGameJoin(QString,QString)));
+    connect(this, SIGNAL(ConnexionImpossible()), m_joindreQuitterWindow, SLOT(ConnexionImpossible()));
+    connect(m_joindreQuitterWindow, SIGNAL(eDemandeParties(QString,int)), this, SLOT(eDemandeParties(QString,int)));
+    connect(m_joindreQuitterWindow, SIGNAL(eCreePartie(QString,int,QString,char)), this, SLOT(eCreePartie(QString,int,QString,char)));
+    connect(m_joindreQuitterWindow, SIGNAL(eJoinPartie(QString,QString)), this, SLOT(eJoinPartie(QString,QString)));
 
-    connect(this, SIGNAL(rGamesReply(QByteArray)), joindreQuitterWindow, SLOT(rGamesReply(QByteArray)));
+    connect(this, SIGNAL(rReponseParties(QByteArray)), m_joindreQuitterWindow, SLOT(rReponseParties(QByteArray)));
 
-    connect(salonJoueurs, SIGNAL(SetReady()), this, SLOT(eGameSetReady()));
-    connect(salonJoueurs, SIGNAL(Quit()), this, SLOT(eGameQuit()));
+    connect(m_salonJoueurs, SIGNAL(siPret()), this, SLOT(eMettrePret()));
+    connect(m_salonJoueurs, SIGNAL(Quitter()), this, SLOT(eQuitterPartie()));
 
-    connect(this, SIGNAL(rGamePlayers(QByteArray)), salonJoueurs, SLOT(GamePlayers(QByteArray)));
+    connect(this, SIGNAL(rJoueursPartie(QByteArray)), m_salonJoueurs, SLOT(rJoueursPartie(QByteArray)));
 
-    joueurs = QList<Joueur>();
-    MonNumero = 0;
+    m_joueurs = QList<Joueur>();
+    m_MonNumero = 0;
 
-    PartieCommancee = false;
+    m_PartieCommancee = false;
 }
 
 
 bool thJeu::Connexion(QString IPServeur, int PortServeur)
 {
-    if (IPServeur != socket->peerName() || PortServeur != socket->peerPort())
+    if (IPServeur != m_socket->peerName() || PortServeur != m_socket->peerPort())
     {
-        joindreQuitterWindow->Voulue = true;
-        if (socket->state() == QTcpSocket::ConnectedState)
+        m_joindreQuitterWindow->m_Voulue = true;
+        if (m_socket->state() == QTcpSocket::ConnectedState)
         {
-            socket->disconnectFromHost();
-            socket->reset();
+            m_socket->disconnectFromHost();
+            m_socket->reset();
         }
-        joindreQuitterWindow->Voulue = false;
+        m_joindreQuitterWindow->m_Voulue = false;
 
-        socket->connectToHost(IPServeur, PortServeur);
-        return socket->waitForConnected(100);
+        m_socket->connectToHost(IPServeur, PortServeur);
+        return m_socket->waitForConnected(100);
     }
     else
         return true;
@@ -62,7 +61,7 @@ int thJeu::ToInt(QByteArray Data)
         Res += d[I];
     return Res;
 }
-void thJeu::TraitementGameSData(QByteArray resultat)
+void thJeu::TraitementDonneeServeur(QByteArray resultat)
 {
     if (resultat[1] == '0')
     {
@@ -83,13 +82,13 @@ void thJeu::TraitementGameSData(QByteArray resultat)
 
             if (tempJoueurs.count() >= 2)
             {
-                temp.Nom = tempJoueurs[0];
-                temp.Couleur = (Qt::GlobalColor) tempJoueurs[1].toInt();
+                temp.m_Nom = tempJoueurs[0];
+                temp.m_Couleur = (Qt::GlobalColor) tempJoueurs[1].toInt();
             }
             else
             {
-                temp.Nom = "";
-                temp.Couleur = Qt::white;
+                temp.m_Nom = "";
+                temp.m_Couleur = Qt::white;
             }
 
             QStringList tempArmee;
@@ -99,22 +98,22 @@ void thJeu::TraitementGameSData(QByteArray resultat)
                 tempArmee = tempJoueurs[j].split('\r');
                 if (tempArmee.count() >= 3)
                 {
-                    armee.PosActuelle.setX(tempArmee[0].toInt());
-                    armee.PosActuelle.setY(tempArmee[1].toInt());
-                    armee.Pixels = tempArmee[2].toInt();
+                    armee.m_PosActuelle.setX(tempArmee[0].toInt());
+                    armee.m_PosActuelle.setY(tempArmee[1].toInt());
+                    armee.m_Pixels = tempArmee[2].toInt();
                 }
                 else
                 {
-                   armee.PosActuelle.setX(0);
-                   armee.PosActuelle.setY(0);
-                   armee.Pixels = 0;
+                   armee.m_PosActuelle.setX(0);
+                   armee.m_PosActuelle.setY(0);
+                   armee.m_Pixels = 0;
                 }
-                temp.Armees.append(armee);
+                temp.m_Armees.append(armee);
             }
 
-            joueurs.append(temp);
-            if (temp.Nom == NomJoueur)
-                MonNumero = numero;
+            m_joueurs.append(temp);
+            if (temp.m_Nom == m_NomJoueur)
+                m_MonNumero = numero;
 
             numero++;
         }
@@ -131,7 +130,7 @@ void thJeu::TraitementGameSData(QByteArray resultat)
             tempArmees = tempJoueurs[i].split('\t');
             tempArmees.removeLast();
 
-            joueurs[i].Armees.clear();
+            m_joueurs[i].m_Armees.clear();
             for (int j = 0; j < tempArmees.length(); j++)
             {
                 QStringList tempPoints = tempArmees[j].split('\r');
@@ -139,153 +138,153 @@ void thJeu::TraitementGameSData(QByteArray resultat)
 
                 if (tempPoints.count() >= 3)
                 {  
-                    armee.PosActuelle.setX(tempPoints[0].toInt());
-                    armee.PosActuelle.setY(tempPoints[1].toInt());
-                    armee.Pixels = tempPoints[2].toInt();
+                    armee.m_PosActuelle.setX(tempPoints[0].toInt());
+                    armee.m_PosActuelle.setY(tempPoints[1].toInt());
+                    armee.m_Pixels = tempPoints[2].toInt();
 
                 }
                 else
                 {
-                    armee.PosActuelle.setX(0);
-                    armee.PosActuelle.setY(0);
-                    armee.Pixels = 0;
+                    armee.m_PosActuelle.setX(0);
+                    armee.m_PosActuelle.setY(0);
+                    armee.m_Pixels = 0;
                 }
-                joueurs[i].Armees.append(armee);
+                m_joueurs[i].m_Armees.append(armee);
             }
         }
     }
-    emit siUpdateAffichage();
+    emit siMetAJourAffichage();
 }
-void thJeu::socket_ReadyRead()
+void thJeu::m_socket_ReadyRead()
 {
-    QByteArray resultat = socket->read(ToInt(socket->read(4)));
+    QByteArray resultat = m_socket->read(ToInt(m_socket->read(4)));
     switch (resultat[0])
     {
-        case GameSData:
-            emit rGameSData();
-            TraitementGameSData(resultat);
+        case DonneeServeur:
+            emit rDonneeServeur();
+            TraitementDonneeServeur(resultat);
             break;
-        case GamePlayers:
-            emit rGamePlayers(resultat);
+        case JoueursPartie:
+            emit rJoueursPartie(resultat);
             break;
-        case GamesReply:
-            emit rGamesReply(resultat);
+        case ReponseParties:
+            emit rReponseParties(resultat);
             break;
-        case GameBegin:
-            emit rGameBegin();
-            salonJoueurs->close();
-            joindreQuitterWindow->close();
+        case DebutPartie:
+            emit rDebutPartie();
+            m_salonJoueurs->close();
+            m_joindreQuitterWindow->close();
             break;
-        case GameEnd:
-            emit rGameEnd();
-            FonctionGameEnd();
+        case FinPartie:
+            emit rFinPartie();
+            FonctionFinPartie();
             break;
     }
 }
-void thJeu::socket_Disconnected()
+void thJeu::m_socket_Disconnected()
 {
-    NomJoueur = "";
-    salonJoueurs->close();
-    PartieCommancee = false;
-    joueurs.clear();
-    delete salonJoueurs;
+    m_NomJoueur = "";
+    m_salonJoueurs->close();
+    m_PartieCommancee = false;
+    m_joueurs.clear();
+    delete m_salonJoueurs;
 
-    salonJoueurs = new SalonJoueurs();
-    connect(salonJoueurs, SIGNAL(SetReady()), this, SLOT(eGameSetReady()));
-    connect(salonJoueurs, SIGNAL(Quit()), this, SLOT(eGameQuit()));
+    m_salonJoueurs = new SalonJoueurs();
+    connect(m_salonJoueurs, SIGNAL(siPret()), this, SLOT(eMettrePret()));
+    connect(m_salonJoueurs, SIGNAL(Quitter()), this, SLOT(eQuitterPartie()));
 
-    connect(this, SIGNAL(rGamePlayers(QByteArray)), salonJoueurs, SLOT(GamePlayers(QByteArray)));
+    connect(this, SIGNAL(rJoueursPartie(QByteArray)), m_salonJoueurs, SLOT(rJoueursPartie(QByteArray)));
 
-    emit siUpdateAffichage();
+    emit siMetAJourAffichage();
 }
 
-QByteArray thJeu::ToQByteArray(int Longueur)
+QByteArray thJeu::ToQByteArray(int Nombre)
 {
-    QByteArray Res = QByteArray(1, ((char)(Longueur >> 24)));
-    Res.append(QByteArray(1, ((char)(Longueur >> 16))));
-    Res.append(QByteArray(1, ((char)(Longueur >> 8))));
-    Res.append(QByteArray(1, (char)(Longueur)));
+    QByteArray Res = QByteArray(1, ((char)(Nombre >> 24)));
+    Res.append(QByteArray(1, ((char)(Nombre >> 16))));
+    Res.append(QByteArray(1, ((char)(Nombre >> 8))));
+    Res.append(QByteArray(1, (char)(Nombre)));
     return  Res;
 }
-void thJeu::sGamesRequest()
+void thJeu::sDemandeParties()
 {
-    QByteArray envoie = QByteArray(1, GamesRequest);
+    QByteArray envoie = QByteArray(1, DemandeParties);
 
     envoie.insert(0, ToQByteArray(envoie.count()));
-    socket->write(envoie);
-    salonJoueurs->close();
-    socket->waitForBytesWritten();
+    m_socket->write(envoie);
+    m_salonJoueurs->close();
+    m_socket->waitForBytesWritten();
 }
-void thJeu::eGamesRequest(QString IPServeur, int PortServeur)
+void thJeu::eDemandeParties(QString IPServeur, int PortServeur)
 {
     if (!Connexion(IPServeur, PortServeur))
-        emit BadConnection();
+        emit ConnexionImpossible();
     else
-        sGamesRequest();
+        sDemandeParties();
 }
 
-void thJeu::eGameCreate(QString IPServeur, int PortServeur, QString Partie, char NoMap)
+void thJeu::eCreePartie(QString IPServeur, int PortServeur, QString Partie, char NoMap)
 {
     if (!Connexion(IPServeur, PortServeur))
-        emit BadConnection();
+        emit ConnexionImpossible();
     else
     {
-        QByteArray envoie = QByteArray(1, GameCreate);
+        QByteArray envoie = QByteArray(1, CreePartie);
         envoie.append(Partie + '\n' + NoMap);
 
         envoie.insert(0, ToQByteArray(envoie.count()));
-        socket->write(envoie);
-        socket->waitForBytesWritten();
+        m_socket->write(envoie);
+        m_socket->waitForBytesWritten();
 
-        sGamesRequest();
+        sDemandeParties();
     }
 }
 
-void thJeu::eGameJoin(QString nomJoueur, QString Partie)
+void thJeu::eJoinPartie(QString nomJoueur, QString Partie)
 {
-    if(NomJoueur == "")
+    if(m_NomJoueur == "")
     {
-        NomJoueur = nomJoueur;
+        m_NomJoueur = nomJoueur;
 
-        QByteArray envoie = QByteArray(1, GameJoin);
-        envoie.append(NomJoueur + '\n' + Partie);
+        QByteArray envoie = QByteArray(1, JoinPartie);
+        envoie.append(m_NomJoueur + '\n' + Partie);
 
         envoie.insert(0, ToQByteArray(envoie.count()));
-        socket->write(envoie);
-        socket->waitForBytesWritten();
+        m_socket->write(envoie);
+        m_socket->waitForBytesWritten();
     }
 
-    salonJoueurs->show();
+    m_salonJoueurs->show();
 }
 
-void thJeu::eGameSetReady()
+void thJeu::eMettrePret()
 {
-    QByteArray envoie = QByteArray(1, GameSetReady);
+    QByteArray envoie = QByteArray(1, MettrePret);
 
     envoie.insert(0, ToQByteArray(envoie.count()));
-    socket->write(envoie);
-    socket->waitForBytesWritten();
+    m_socket->write(envoie);
+    m_socket->waitForBytesWritten();
 }
 
-void thJeu::eGameQuit()
+void thJeu::eQuitterPartie()
 {
-    QByteArray envoie = QByteArray(1, GameQuit);
+    QByteArray envoie = QByteArray(1, QuitterPartie);
 
     envoie.insert(0, ToQByteArray(envoie.count()));
-    socket->write(envoie);
-    socket->waitForBytesWritten();
-    joindreQuitterWindow->Voulue = true;
-    socket->disconnectFromHost();
+    m_socket->write(envoie);
+    m_socket->waitForBytesWritten();
+    m_joindreQuitterWindow->m_Voulue = true;
+    m_socket->disconnectFromHost();
 }
 
-void thJeu::slMouseClick(QList<QPoint> points)
+void thJeu::slSourisPressee(QList<QPoint> points)
 {
     if (points.count() > 0)
     {
         int NoArmee = TrouveNoArmee(points[0]);
         if (NoArmee != -1)
         {
-            QByteArray envoie = QByteArray(1, GameCData);
+            QByteArray envoie = QByteArray(1, DonneesClient);
             envoie.append('\n');
             envoie.append(QString::number(NoArmee));
             envoie.append('\n');
@@ -297,11 +296,11 @@ void thJeu::slMouseClick(QList<QPoint> points)
                 envoie.append('\t');
             }
             envoie.append('\n');
-            envoie.append(Tick);
+            envoie.append(m_Tick);
 
             envoie.insert(0, ToQByteArray(envoie.count()));
-            socket->write(envoie);
-            socket->waitForBytesWritten();
+            m_socket->write(envoie);
+            m_socket->waitForBytesWritten();
         }
     }
 }
@@ -314,32 +313,32 @@ int thJeu::TrouveNoArmee(QPoint point)
     do
     {
         regionArmee = QPainterPath();
-        regionArmee.addEllipse(joueurs[MonNumero].Armees[i].PosActuelle, -20 * pow(2, -joueurs[MonNumero].Armees[i].Pixels / 250.0) + 25, -20 * pow(2, -joueurs[MonNumero].Armees[i].Pixels / 250.0) + 25);
+        regionArmee.addEllipse(m_joueurs[m_MonNumero].m_Armees[i].m_PosActuelle, -20 * pow(2, -m_joueurs[m_MonNumero].m_Armees[i].m_Pixels / 250.0) + 25, -20 * pow(2, -m_joueurs[m_MonNumero].m_Armees[i].m_Pixels / 250.0) + 25);
     }
-    while (!regionArmee.intersects(QRect(point, point)) && ++i < joueurs[MonNumero].Armees.count());
+    while (!regionArmee.intersects(QRect(point, point)) && ++i < m_joueurs[m_MonNumero].m_Armees.count());
 
-    return i == joueurs[MonNumero].Armees.count() ? -1 : i;
+    return i == m_joueurs[m_MonNumero].m_Armees.count() ? -1 : i;
 }
 
-void thJeu::FonctionGameEnd()
+void thJeu::FonctionFinPartie()
 {
     QString Gagnant = "";
     int i = 0;
 
-    while (Gagnant == "" && i < joueurs.count())
+    while (Gagnant == "" && i < m_joueurs.count())
     {
-        if (joueurs[i].Armees.count() > 1)
-            Gagnant = joueurs[i].Nom;
+        if (m_joueurs[i].m_Armees.count() > 1)
+            Gagnant = m_joueurs[i].m_Nom;
         i++;
     }
 
-    if (Gagnant == joueurs[MonNumero].Nom)
-        QMessageBox::about(joindreQuitterWindow, "Victoire!", "Vous avez gagné!");
+    if (Gagnant == m_joueurs[m_MonNumero].m_Nom)
+        QMessageBox::about(m_joindreQuitterWindow, "Victoire!", "Vous avez gagne!");
     else
-        QMessageBox::about(joindreQuitterWindow, "Défaite", "Le joueur " + Gagnant + " a remporté!");
+        QMessageBox::about(m_joindreQuitterWindow, "Defaite", "Le joueur " + Gagnant + " a remporte!");
 
-    joindreQuitterWindow->Voulue = true;
-    socket->disconnectFromHost();
-    joueurs.clear();
-    emit siUpdateAffichage();
+    m_joindreQuitterWindow->m_Voulue = true;
+    m_socket->disconnectFromHost();
+    m_joueurs.clear();
+    emit siMetAJourAffichage();
 }

@@ -15,7 +15,7 @@ SalonJoueurs::~SalonJoueurs()
 
 void SalonJoueurs::on_btnPret_clicked()
 {
-    emit SetReady();
+    emit siPret();
 
     if (ui->btnPret->text() == "Pret")
         ui->btnPret->setText("Non Pret");
@@ -25,10 +25,10 @@ void SalonJoueurs::on_btnPret_clicked()
 
 void SalonJoueurs::on_btnQuitter_clicked()
 {
-    emit Quit();
+    emit Quitter();
 }
 
-void SalonJoueurs::GamePlayers(QByteArray resultat)
+void SalonJoueurs::rJoueursPartie(QByteArray resultat)
 {
     QString buffer = resultat.remove(0, 1);
     QStringList Liste = buffer.split('\n');

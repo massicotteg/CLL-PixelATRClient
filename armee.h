@@ -7,9 +7,9 @@ class Armee
 {
 public:
     Armee();
-    QPoint PosActuelle;
-    QList<QPoint> PtsDeplacement;
-    int Pixels;
+    QPoint m_PosActuelle;
+    QList<QPoint> m_PtsDeplacement;
+    int m_Pixels;
 };
 
 #endif // ARMEE_H

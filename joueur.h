@@ -8,9 +8,9 @@ class Joueur
 {
 public:
     Joueur();
-    QColor Couleur;
-    QList<Armee> Armees;
-    QString Nom;
+    QColor m_Couleur;
+    QList<Armee> m_Armees;
+    QString m_Nom;
 };
 
 #endif // JOUEUR_H

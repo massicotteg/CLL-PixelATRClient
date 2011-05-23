@@ -14,13 +14,13 @@ class JoindreQuitterWindow : public QMainWindow
 
 public:
     explicit JoindreQuitterWindow(QWidget *parent = 0);
-    bool Voulue;
+    bool m_Voulue;
     ~JoindreQuitterWindow();
 
 signals:
-    void eGamesRequest(QString, int);
-    void eGameCreate(QString, int, QString, char);
-    void eGameJoin(QString, QString);
+    void eDemandeParties(QString, int);
+    void eCreePartie(QString, int, QString, char);
+    void eJoinPartie(QString, QString);
 
 private slots:
     void on_btnAfficherParties_clicked();
@@ -28,16 +28,16 @@ private slots:
     void on_btnNouvellePartie_clicked();
 
     void slDisconnected();
-    void BadConnection();
-    void rGamesReply(QByteArray resultat);
+    void ConnexionImpossible();
+    void rReponseParties(QByteArray resultat);
 
     void on_lbParties_currentRowChanged(int currentRow);
 
 private:
     Ui::JoindreQuitterWindow *ui;
-    QString IPServeur;
-    int PortServeur;
-    QString Partie;
+    QString m_IPServeur;
+    int m_PortServeur;
+    QString m_Partie;
 
     void GameJoin();
     void GameCreate();

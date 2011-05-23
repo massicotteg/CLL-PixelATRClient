@@ -20,7 +20,7 @@ public:
     ~PixelATRClientWindow();
 
 signals:
-    void siMouseClick(QList<QPoint>);
+    void siSourisPressee(QList<QPoint>);
 
 protected:
     void mousePressEvent(QMouseEvent *);
@@ -30,15 +30,15 @@ protected:
 private slots:
     void on_btnJoindreQuitter_clicked(); 
     void slTimeOutSouris();
-    void slGameBegin();
-    void slUpdateAffichage();
+    void slDebutPartie();
+    void slMetAJourAffichage();
 
 private:
     Ui::PixelATRClientWindow *ui;
     void paintEvent(QPaintEvent *);
     thJeu *m_Jeu;
-    QTimer *timerSouris;
-    QList<QPoint> points;
+    QTimer *m_timerSouris;
+    QList<QPoint> m_points;
     void AjoutPoint(QPoint pt);
 };
 

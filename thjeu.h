@@ -7,50 +7,50 @@
 #include "joindrequitterwindow.h"
 #include "joueur.h"
 
-class thJeu : public QThread
+class thJeu : public QObject
 {
     Q_OBJECT
 public:
-    explicit thJeu(QObject *parent = 0);
-    QTcpSocket *socket;
-    JoindreQuitterWindow *joindreQuitterWindow;
-    SalonJoueurs *salonJoueurs;
-    QString NomJoueur;
-    enum CodesClients { GamesRequest, GameCreate, GameJoin, GameSetReady, GameCData, GameQuit };
-    enum CodesServeurs { GamesReply, GamePlayers, GameBegin, GameSData, GameEnd };
+    explicit thJeu();
+    QTcpSocket *m_socket;
+    JoindreQuitterWindow *m_joindreQuitterWindow;
+    SalonJoueurs *m_salonJoueurs;
+    QString m_NomJoueur;
+    enum CodesClients { DemandeParties, CreePartie, JoinPartie, MettrePret, DonneesClient, QuitterPartie };
+    enum CodesServeurs { ReponseParties, JoueursPartie, DebutPartie, DonneeServeur, FinPartie };
     bool Connexion(QString IPServeur, int PortServeur);
     int TrouveNoArmee(QPoint);
-    QList<Joueur> joueurs;
-    int MonNumero;
-    bool PartieCommancee;
+    QList<Joueur> m_joueurs;
+    int m_MonNumero;
+    bool m_PartieCommancee;
 
 signals:
-    void rGamesReply(QByteArray);
-    void rGamePlayers(QByteArray);
-    void rGameBegin();
-    void rGameSData();
-    void rGameEnd();
-    void BadConnection();
-    void siUpdateAffichage();
+    void rReponseParties(QByteArray);
+    void rJoueursPartie(QByteArray);
+    void rDebutPartie();
+    void rDonneeServeur();
+    void rFinPartie();
+    void ConnexionImpossible();
+    void siMetAJourAffichage();
 
 private:
-    void sGamesRequest();
-    int Tick;
+    void sDemandeParties();
+    int m_Tick;
     QByteArray ToQByteArray(int);
     int ToInt(QByteArray);
-    void TraitementGameSData(QByteArray);
-    void FonctionGameEnd();
+    void TraitementDonneeServeur(QByteArray);
+    void FonctionFinPartie();
 
 
 public slots:
-    void socket_ReadyRead();
-    void socket_Disconnected();
-    void eGamesRequest(QString, int);
-    void eGameCreate(QString, int, QString, char);
-    void eGameJoin(QString, QString);
-    void eGameSetReady();
-    void eGameQuit();
-    void slMouseClick(QList<QPoint>);
+    void m_socket_ReadyRead();
+    void m_socket_Disconnected();
+    void eDemandeParties(QString, int);
+    void eCreePartie(QString, int, QString, char);
+    void eJoinPartie(QString, QString);
+    void eMettrePret();
+    void eQuitterPartie();
+    void slSourisPressee(QList<QPoint>);
 };
 
 #endif // THJEU_H
